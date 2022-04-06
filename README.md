@@ -21,9 +21,8 @@ Si en lugar de trabajar con un entorno _Linux_, se está construyendo el proyect
 Para construir el proyecto por completo, ejecute en la raíz del repositorio el siguiente comando:
 
 ```bash
-user@machine:path/ $ cmake -S . -B bin
-user@machine:path/ $ cd bin
-user@machine:path/ $ make
+user@machine:path/ $ chmod u+x build.sh
+user@machine:path/ $ ./build.sh
 ```
 
 En un entorno _Microsoft Windows_, en lugar de ejecutar el comando `make`, se deberá abrir la solución generada `bin/Compiler.sln` con el IDE _Microsoft Visual Studio 2022_. Los ejecutables que este sistema construye se depositan dentro del directorio `bin/Debug` y `bin/Release` según corresponda.
