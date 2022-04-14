@@ -1,3 +1,4 @@
+def 
 SET n1 = {NODE(), NODE(), NODE()};
 SET e1 = {EDGE(), EDGE(,), EDGE()};
 
@@ -8,3 +9,6 @@ GRAPH g2 = <n2, e2>;
 GRAPH g3 = ;
 
 serialize(G)
+
+data
+lerolero candelero
