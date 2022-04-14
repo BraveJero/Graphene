@@ -15,14 +15,16 @@
 
 %token INTEGER
 
+%token US_ASCII_CHAR
+
 // Reglas de asociatividad y precedencia (de menor a mayor):
 %left ADD SUB
 %left MUL DIV
 
 %%
 
-program: expression												{ $$ = ProgramGrammarAction($1); }
-	;
+program: expression	US_ASCII_CHAR											{ $$ = ProgramGrammarAction($1); }
+	;	
 
 expression: expression ADD expression							{ $$ = AdditionExpressionGrammarAction($1, $3); }
 	| expression SUB expression									{ $$ = SubtractionExpressionGrammarAction($1, $3); }

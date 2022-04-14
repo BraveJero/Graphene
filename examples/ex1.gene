@@ -1,0 +1,18 @@
+#add exe2.gene
+
+start:
+  // Creó un conjunto de nodos:
+  V = Set(Node(“A”), Node(“C”), Node(“C”));
+
+  // Creó un conjunto de aristas:
+  K = Set(Edge(“A”, “B”), Node(“C”, “B”), Node(“C”, “A”));
+
+  // Creó un grafo con el conjunto de nodos V y conjunto de aristas K:
+  G = <V, K>;
+
+  // Tomó directamente el nodo “A”:
+  adjacent = G.getAdjacent(Node(“A”));
+  G.delete(Node("C"));
+  adjacent.printSet(); // Imprime {"B"}
+  
+

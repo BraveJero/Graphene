@@ -1,0 +1,4 @@
+GRAPH g1 = <n1, e1>
+GRAPH g2 = <n2, e2>
+
+GRAPH g3 = 

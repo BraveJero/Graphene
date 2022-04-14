@@ -20,3 +20,8 @@ TokenID UnknownPatternAction(const char * lexeme) {
 	LogDebug("UnknownPatternAction: '%s'.", lexeme);
 	return YYUNDEF;
 }
+
+TokenID StringPatternAction(const char * lexeme) {
+	LogDebug("StringPatternAction: '%s'.", lexeme);
+	return US_ASCII_TEXT;
+}

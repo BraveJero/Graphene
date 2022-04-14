@@ -29,7 +29,8 @@ typedef enum TokenID {
 	CLOSE_PARENTHESIS,
 
 	// Tipos de dato.
-	INTEGER
+	INTEGER,
+	US_ASCII_TEXT
 } TokenID;
 
 /**
@@ -44,5 +45,7 @@ TokenID IntegerPatternAction(const char * lexeme);
 void IgnoredPatternAction(const char * lexeme);
 
 TokenID UnknownPatternAction(const char * lexeme);
+
+TokenID StringPatternAction(const char * lexeme);
 
 #endif

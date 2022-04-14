@@ -18,6 +18,7 @@ crlf			\r\n
 digit			[0-9]
 endline			\n
 whitespace		[ \f\n\r\t\v]
+hola		[a-zA-Z]
 
 %%
 
@@ -30,6 +31,8 @@ whitespace		[ \f\n\r\t\v]
 ")"											{ return CLOSE_PARENTHESIS; }
 
 {digit}+									{ return IntegerPatternAction(yytext); }
+
+{hola}+							{ return StringPatternAction(yytext); }
 
 {whitespace}								{ IgnoredPatternAction(yytext); }
 
