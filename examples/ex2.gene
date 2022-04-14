@@ -1,4 +1,10 @@
-GRAPH g1 = <n1, e1>
-GRAPH g2 = <n2, e2>
+SET n1 = {NODE(), NODE(), NODE()};
+SET e1 = {EDGE(), EDGE(,), EDGE()};
 
-GRAPH g3 = 
+
+GRAPH g1 = <n1, e1>;
+GRAPH g2 = <n2, e2>;
+
+GRAPH g3 = ;
+
+serialize(G)
