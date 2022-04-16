@@ -1,0 +1,23 @@
+# R8.5
+# Aceptar
+# Crear un grafo, iterar e imprimir el contenido en sus nodos.
+
+DEF GRAPH createCompleteGraph(INTEGER n);
+
+DEF INTEGER main():
+    GRAPH graph = createCompleteGraph(5);
+
+    WHILE
+
+
+DEF GRAPH createCompleteGraph(INTEGER n):
+    SET nodes = {};
+    SET edges = {};
+    FOR i FROM 1 TO n INCLUSIVE:
+        Node node = ("Node n" + i);
+        nodes = nodes + { node };
+        FOR j FROM 1 TO i:
+            Node node_j = nodes.find("Node n" j);
+            edges = edges + { (node_j, node) };
+    
+    RETURN <nodes, edges>;

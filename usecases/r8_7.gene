@@ -1,0 +1,11 @@
+# R8.7
+# Aceptar
+# Crear 2 conjuntos de nodos, y obtener un único grafo desde ellos.
+
+DEF INTEGER main():
+    SET s1 = { ("A"), ("B"), ("C") };
+    SET s2 = { ("D"), ("E"), ("F") };
+
+    GRAPH graph = <s1 + s2, {}>;
+
+    RETURN 0;

@@ -1,0 +1,6 @@
+# R8.3
+# Aceptar
+# Crea un programa que utilice una pila y una cola y mueva sus elementos a un conjunto.
+
+DEF INTEGER main():
+    QUEUE queue = 

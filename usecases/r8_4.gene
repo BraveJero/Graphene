@@ -1,0 +1,12 @@
+# R8.4
+# Aceptar
+# Crear dos grafos, y agregar una arista entre ellos para crear un nuevo grafo conexo.
+
+DEF INTEGER main():
+    GRAPH g1 = < { ("A") }, {} >;
+    GRAPH g2 = < { ("B") }, {} >;
+
+    # TODO: 
+    GRAPH g3 = ...;
+
+    RETURN 0;

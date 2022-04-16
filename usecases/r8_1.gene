@@ -1,0 +1,13 @@
+# R8.1
+# Aceptar
+# Crear un grafo de 10 nodos.
+
+DEF INTEGER main():
+    SET nodes = {};
+    FOR i FROM 1 TO 10 INCLUSIVE:
+        NODE newNode = ("Node n" + i);
+        nodes = nodes + newNode;
+    
+    GRAPH graph = <nodes, {}>;
+
+    RETURN 0;

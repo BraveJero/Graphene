@@ -1,0 +1,19 @@
+# R8.2
+# Aceptar
+# Crear un árbol de 15 nodos, cuyos nodos alberguen un número.
+
+DEF INTEGER main():
+    SET nodes = {};
+    SET edges = {};
+
+    FOR i FROM 1 TO 16 EXCLUSIVE:
+        NODE node = ("Node n" + i);
+        nodes = nodes + {node};
+        IF i/2 >= 1:
+            NODE parent = nodes.find("Node n" + i/2);
+            EDGE edge = (parent, node);
+            edges = edges + edge;
+    
+    DIGRAPH g = <nodes, edges>;
+
+    RETURN 0;
