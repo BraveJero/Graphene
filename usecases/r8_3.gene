@@ -2,5 +2,24 @@
 # Aceptar
 # Crea un programa que utilice una pila y una cola y mueva sus elementos a un conjunto.
 
-DEF INTEGER main():
-    QUEUE queue = 
+CREATE QUEUE cola WITH INTEGER VALUES;
+CREATE STACK pila WITH INTEGER VALUES;
+CREATE SET conjunto WITH INTEGER VALUES;
+
+INSERT INTO cola VALUE (1);
+INSERT INTO cola VALUE (2);
+INSERT INTO cola VALUE (3);
+INSERT INTO cola VALUE (4);
+INSERT INTO cola VALUE (5);
+
+INSERT INTO pila VALUE (6);
+INSERT INTO pila VALUE (7);
+INSERT INTO pila VALUE (8);
+INSERT INTO pila VALUE (9);
+INSERT INTO pila VALUE (10);
+
+WHILE cola IS NOT EMPTY:
+    INSERT INTO conjunto VALUE(POP FROM cola);
+
+WHILE pila IS NOT EMPTY:
+    INSERT INTO conjunto VALUE(POP FROM pila);

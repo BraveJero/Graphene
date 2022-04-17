@@ -1,3 +1,25 @@
 # R8.14
 # Rechazar
 # Realizar un cómputo entre grafos usando operadores que no están definidos sobre los mismos.
+
+DEF GRAPH createCompleteGraph(INTEGER n);
+
+DEF INTEGER main():
+    GRAPH K4 = createCompleteGraph(4);
+    GRAPH K5 = createCompleteGraph(5);
+    
+    GRAPH g = K4 * K5;
+
+    RETURN 0;
+
+DEF GRAPH createCompleteGraph(INTEGER n):
+    SET nodes = {};
+    SET edges = {};
+    FOR i FROM 1 TO n INCLUSIVE:
+        Node node = ("Node n" + i);
+        nodes = nodes + { node };
+        FOR j FROM 1 TO i:
+            Node node_j = nodes.find("Node n" j);
+            edges = edges + { (node_j, node) };
+    
+    RETURN <nodes, edges>;

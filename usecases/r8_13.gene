@@ -1,3 +1,14 @@
 # R8.13
 # Rechazar
 # Intentar imprimir un conjunto de aristas en lugar de un grafo.
+
+DEF INTEGER main():
+    NODE n1 = ("A");
+    NODE n2 = ("B");
+    EDGE e = (n1, n2);
+    
+    SET edges = { e };
+
+    WRITE(EDGES);
+
+    RETURN 0;

@@ -2,6 +2,16 @@
 # Aceptar
 # Crear un árbol de 15 nodos, cuyos nodos alberguen un número.
 
+CREATE DIGRAPH g;
+
+FOR i FROM 1 TO 16 EXCLUSIVE:
+    INSERT INTO g NODE ("Node " + i);
+    INT parent = i/2;
+    IF parent >= 1:
+        INSERT INTO g EDGE ("Node " + parent, "Node " + i);
+
+
+
 DEF INTEGER main():
     SET nodes = {};
     SET edges = {};

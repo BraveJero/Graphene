@@ -2,3 +2,5 @@
 # Aceptar
 # Crear un grafo de palabras y buscar en el mismo aquellos nodos con una palabra clave.
 
+DEF INTEGER main():
+    

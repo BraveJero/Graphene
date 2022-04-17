@@ -1,3 +1,9 @@
 # R8.12
 # Rechazar
 # Imprimir un grafo inexistente.
+
+DEF INTEGER main():
+    GRAPH g;
+    WRITE(g);
+
+    RETURN 0;
