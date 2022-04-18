@@ -2,8 +2,5 @@
 # Rechazar
 # Imprimir un grafo inexistente.
 
-DEF INTEGER main():
-    GRAPH g;
-    WRITE(g);
-
-    RETURN 0;
+START:
+    PRINT g;

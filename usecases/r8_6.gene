@@ -2,5 +2,25 @@
 # Aceptar
 # Crear un grafo de palabras y buscar en el mismo aquellos nodos con una palabra clave.
 
-DEF INTEGER main():
+DEF SET<NODE> nodesWithKeyword(GRAPH<STRING, ?> g, STRING label0, STRING keyword):
+    CREATE SET<NODE> s;
+    CREATE NODE n0;
+    GET FROM g WITH LABEL label0 INTO n0;
+    FOR node IN g WITH BFS ENTRY n0:
+        IF node.data EQUALS keyword:
+            INSERT INTO s VALUE node;
     
+    RETURN s;
+
+START:
+    CREATE GRAPH<STRING, EMPTY> g;
+    INSERT INTO g NODE ("A", "TLA");
+    INSERT INTO g NODE ("B", "TLA");
+    INSERT INTO g NODE ("C", "Protos");
+
+    INSERT INTO g EDGE ("A" -> "B");
+    INSERT INTO g EDGE ("A" -> "C");
+
+    CREATE SET<NODE> s;
+    INSERT INTO s SET nodesWithKeyword(g, ("1"), "1");
+    PRINT s; # > [("1", "1"), ("uno", "1")];

@@ -2,13 +2,9 @@
 # Rechazar
 # Crear un grafo, pero usar el conjunto de aristas donde se espera el conjunto de nodos.
 
-DEF INTEGER main():
-    Node nodeA = ("A");
-    Node nodeB = ("B");
-    
-    SET nodes = {nodeA, nodeB};
-    SET edges = {(nodeA, nodeB)};
-
-    GRAPH graph = <edges, nodes>;
-
-    RETURN 0;
+START:
+    CREATE GRAPH<EMPTY, EMPTY> g;
+    CREATE SET<EDGES<EMPTY>> edges;
+    INSERT INTO g NODES edges;  # Breaks
+    INSERT INTO g NODE ("2");
+    INSERT INTO g NODE ("1" -> "2");

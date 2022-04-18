@@ -2,3 +2,6 @@
 # Rechazar
 # Asignar a un nodo que albergue un tipo de dato, un valor de otro tipo incompatible.
 
+START:
+    CREATE NODE<EMPTY> n;
+    INSERT INTO n INTEGER 0;

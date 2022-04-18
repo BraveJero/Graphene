@@ -2,10 +2,13 @@
 # Aceptar
 # Crear 2 conjuntos de nodos, y obtener un único grafo desde ellos.
 
-DEF INTEGER main():
-    SET s1 = { ("A"), ("B"), ("C") };
-    SET s2 = { ("D"), ("E"), ("F") };
+START:
+    CREATE SET<NODE<EMPTY>> s1;
+    INSERT INTO s1 NODE ("1");
 
-    GRAPH graph = <s1 + s2, {}>;
+    CREATE SET<NODE<EMPTY>> s2;
+    INSERT INTO s1 NODE ("3");
 
-    RETURN 0;
+    CREATE GRAPH<EMTPY, EMPTY> g;
+    INSERT INTO g SET<NODE<EMPTY>> s1;
+    INSERT INTO g SET<NODE<EMPTY>> s2;

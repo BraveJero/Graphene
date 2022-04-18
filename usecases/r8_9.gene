@@ -2,3 +2,15 @@
 # Aceptar
 # Almacenar un grafo en un archivo.
 
+START:
+    CREATE DIGRAPH<INTEGER, EMPTY> g;
+
+    INSERT INTO ceil INTEGER 17;
+    FOR i FROM 1 TO ceil: # Arbol binario
+        INSERT INTO g NODE<INTEGER> ("Node " + i);
+        INSERT INTO parent INTEGER i/2;
+        IF parent >= 1:
+            INSERT INTO g EDGE<EMPTY> ("Node " + parent -> "Node " + i);
+
+    DUMP g IN FILE "graph.out";
+

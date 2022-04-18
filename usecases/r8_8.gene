@@ -1,3 +1,15 @@
 # R8.8
 # Aceptar
 # Crear un grafo, e imprimir el contenido en sus aristas (ignorar el contenido en los nodos).
+
+START:
+    CREATE DIGRAPH<EMPTY, INTEGER> g;
+
+    INSERT INTO ceil INTEGER 17;
+    FOR i FROM 1 TO ceil: # Arbol binario
+        INSERT INTO g NODE<EMPTY> ("Node " + i);
+        INSERT INTO parent INTEGER i/2;
+        IF parent >= 1:
+            INSERT INTO g EDGE<INTEGER> ("Node " + parent -> "Node " + i, i);
+
+    PRINT g.edges;

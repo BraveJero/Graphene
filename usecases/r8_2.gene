@@ -2,28 +2,12 @@
 # Aceptar
 # Crear un árbol de 15 nodos, cuyos nodos alberguen un número.
 
-CREATE DIGRAPH g;
+START:
+    CREATE DIGRAPH<INTEGER, EMPTY> g;
 
-FOR i FROM 1 TO 16 EXCLUSIVE:
-    INSERT INTO g NODE ("Node " + i);
-    INT parent = i/2;
-    IF parent >= 1:
-        INSERT INTO g EDGE ("Node " + parent, "Node " + i);
-
-
-
-DEF INTEGER main():
-    SET nodes = {};
-    SET edges = {};
-
-    FOR i FROM 1 TO 16 EXCLUSIVE:
-        NODE node = ("Node n" + i);
-        nodes = nodes + {node};
-        IF i/2 >= 1:
-            NODE parent = nodes.find("Node n" + i/2);
-            EDGE edge = (parent, node);
-            edges = edges + edge;
-    
-    DIGRAPH g = <nodes, edges>;
-
-    RETURN 0;
+    INTEGER ceil = 15;
+    FOR i FROM 1 TO ceil: // Arbol binario
+        INSERT INTO g NODE ("Node " + i) WITH VALUE i;
+        INTEGER parent = i/2;
+        IF parent >= 1:
+            INSERT INTO g EDGE ("Node " + parent, "Node " + i);
