@@ -40,6 +40,7 @@ typedef enum TokenID {
 	CHAR,
 	DECIMAL,
 	STRING,
+	BOOLEAN,
 	NODE,
 	EDGE,
 	GRAPH,

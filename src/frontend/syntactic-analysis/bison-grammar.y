@@ -12,8 +12,8 @@
 
 %token START CREATE INSERT INTO FOR WHILE FROM IF ELSE TO INCLUSIVE EXCLUSIVE WITH VALUE DFS BFS IS NOT POP ENTRY LET BE
 %token PRINT DEF LABEL GET IN EQUALS RETURN DUMP GRAPHVIZ_DOT
-%token INTEGER STRING CHAR DECIMAL NODE EDGE GRAPH DIGRAPH EMPTY_TYPE QUEUE STACK SET 
-%token INTEGER_TYPE ANY_TYPE DECIMAL_TYPE CHAR_TYPE STRING_TYPE
+%token INTEGER STRING CHAR DECIMAL BOOLEAN NODE EDGE GRAPH DIGRAPH EMPTY_TYPE QUEUE STACK SET 
+%token INTEGER_TYPE ANY_TYPE DECIMAL_TYPE CHAR_TYPE STRING_TYPE BOOLEAN_TYPE
 %token GT LT GEQ LEQ EQ AND OR
 %token OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_ANTILAMBDA CLOSE_ANTILAMBDA COMMA COLON DOT RIGHT_ARROW LEFT_ARROW IDENTIFIER EOL
 
@@ -56,20 +56,22 @@ for_stmt: FOR IDENTIFIER FROM INTEGER TO INTEGER
 	| FOR IDENTIFIER IN 
 	;
 
-while_block: WHILE condition COLON body
+while_block: WHILE OPEN_PARENTHESIS condition CLOSE_PARENTHESIS COLON body
 	;
 
-if_block: IF condition COLON body
-	| IF condition COLON body ELSE COLON body
-	| IF condition COLON body ELSE if_block
+if_block: IF OPEN_PARENTHESIS condition CLOSE_PARENTHESIS COLON body
+	| IF OPEN_PARENTHESIS condition CLOSE_PARENTHESIS COLON body ELSE COLON body
+	| IF OPEN_PARENTHESIS condition CLOSE_PARENTHESIS COLON body ELSE if_block
 	;
 
-condition: value comparator value 
+condition: BOOLEAN
+	| value comparator value 
 	| value comparator prim_data_type_instance
 	| prim_data_type_instance comparator value
 	| prim_data_type_instance comparator prim_data_type_instance
-	| condition AND condition
-	| condition OR condition
+	| OPEN_PARENTHESIS condition CLOSE_PARENTHESIS AND OPEN_PARENTHESIS condition CLOSE_PARENTHESIS
+	| OPEN_PARENTHESIS condition CLOSE_PARENTHESIS OR OPEN_PARENTHESIS condition CLOSE_PARENTHESIS
+	| NOT OPEN_PARENTHESIS condition CLOSE_PARENTHESIS
 	;
 
 value: IDENTIFIER
@@ -124,6 +126,7 @@ prim_data_type: EMPTY_TYPE										{  }
 	| STRING_TYPE												{  }
 	| INTEGER_TYPE												{  }
 	| DECIMAL_TYPE												{  }
+	| BOOLEAN_TYPE												{  }
 	;
 
 extra_data_type: node_type										{  }
@@ -159,6 +162,7 @@ prim_data_type_instance: string									{  }
 	| CHAR														{  }
 	| INTEGER													{  }
 	| DECIMAL													{  }
+	| BOOLEAN
 	;
 
 extra_data_type_instance: node_instance
@@ -181,9 +185,6 @@ string: STRING													{  }
 	| INTEGER ADD STRING										{  }
 	| STRING ADD DECIMAL										{  }
 	| DECIMAL ADD STRING										{  }
-	;
-
-integer: 
 	;
 
 expression: expression ADD expression							{ /* $$ = AdditionExpressionGrammarAction($1, $3); */ }

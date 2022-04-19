@@ -1,6 +1,19 @@
 %{
 
 #include "flex-actions.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
+
+#define MAX_DEPTH 72
+
+int nesting = 0 ;
+unsigned int indent_stack[MAX_DEPTH] ;
+unsigned int level = 0 ;
+
+unsigned int first = 1 ;
+
+void process_indent(char* line) ;
 
 %}
 
@@ -29,6 +42,15 @@ newline         \n
 #								{ BEGIN(COMMENT); }
 <COMMENT>.						{  }
 <COMMENT>\n						{ BEGIN(INITIAL); }
+
+^[ ]*\n       {/* Ignore blank lines. */}
+^[ ]*[^ \n]+  { int last = yyleng - 1;
+                process_indent(yytext) ;
+                while ((last >= 0) &&
+                      (yytext[last] != ' ')) {
+                unput(yytext[last]);
+                last-- ; }}
+
 
 start							{ printf("{%s}\n", yytext); return START; }
 create							{ printf("{%s}\n", yytext); return CREATE; }
@@ -64,9 +86,10 @@ let							    { printf("{%s}\n", yytext); return LET; }
 be							    { printf("{%s}\n", yytext); return BE; }
 
 \'.\'							{ printf("{%s}\n", yytext); return CHAR; }
+true|false                      { printf("{%s}\n", yytext); return BOOLEAN; }
 {digit}+						{ printf("{%s}\n", yytext); return IntegerPatternAction(yytext); }
 {digit}+.{digit}                { printf("{%s}\n", yytext); return DecimalPatternAction(yytext); }
-\"(\\.|[^"\\])*\"               { printf("{%s}\n", yytext); return StringPatternAction(yytext); }
+\"(\\.|[^\"\\])*\"              { printf("{%s}\n", yytext); return StringPatternAction(yytext); }
 
 node							{ printf("{%s}\n", yytext); return NODE; }
 edge							{ printf("{%s}\n", yytext); return EDGE; }
@@ -78,6 +101,7 @@ digraph							{ printf("{%s}\n", yytext); return DIGRAPH; }
 
 integer							{ printf("{%s}\n", yytext); return INTEGER_TYPE; }
 any								{ printf("{%s}\n", yytext); return ANY_TYPE; }
+boolean                         { printf("{%s}\n", yytext); return BOOLEAN_TYPE; }
 decimal							{ printf("{%s}\n", yytext); return DECIMAL_TYPE; }
 char							{ printf("{%s}\n", yytext); return CHAR_TYPE; }
 string							{ printf("{%s}\n", yytext); return STRING_TYPE; }
@@ -97,8 +121,8 @@ string							{ printf("{%s}\n", yytext); return STRING_TYPE; }
 and                             { printf("{%s}\n", yytext); return AND; }   
 or                              { printf("{%s}\n", yytext); return OR; } 
 
-"("								{ printf("{%s}\n", yytext); return OPEN_PARENTHESIS; }
-")"								{ printf("{%s}\n", yytext); return CLOSE_PARENTHESIS; }
+"("								{ printf("{%s}\n", yytext); nesting++; return OPEN_PARENTHESIS; }
+")"								{ printf("{%s}\n", yytext); nesting--; return CLOSE_PARENTHESIS; }
 "<"								{ printf("{%s}\n", yytext); return OPEN_ANTILAMBDA; }
 ">"								{ printf("{%s}\n", yytext); return CLOSE_ANTILAMBDA; }
 ","								{ printf("{%s}\n", yytext); return COMMA; }
@@ -107,7 +131,7 @@ or                              { printf("{%s}\n", yytext); return OR; }
 ";"								{ printf("{%s}\n", yytext); return SEMICOLON; }
 "<-"						    { printf("{%s}\n", yytext); return LEFT_ARROW; }
 "->"						    { printf("{%s}\n", yytext); return RIGHT_ARROW; }
-
+       
 ({alpha}|_)({alpha}|_|{digit})*	{ printf("{%s}\n", yytext); return IDENTIFIER; }
 
 {newline}       				{ printf("{%s}\n", yytext); return EOL; }
@@ -117,3 +141,44 @@ or                              { printf("{%s}\n", yytext); return OR; }
 .								{ printf("{%s}\n", yytext); return UnknownPatternAction(yytext); }
 
 %%
+
+unsigned int white_count(char* line) {
+  unsigned int count = 0 ;
+  while (*line == ' ')
+    count++, line++ ;
+  return count ;
+}
+
+void process_indent(char* line) {
+  if (nesting)
+    /* Ignore indents while nested. */
+    return ;
+
+  unsigned int indent = white_count(line) ;
+
+  if (indent == indent_stack[level]) {
+    if (!first) printf(" ;") ;
+    first = 0 ;
+    return ;
+  }
+
+  if (indent > indent_stack[level]) {
+    printf(" {") ;
+    assert(level+1 < MAX_DEPTH) ;
+    indent_stack[++level] = indent ;
+    return ;
+  }
+
+  while (indent < indent_stack[level]) {
+    --level ;
+    printf(" }") ;
+  }
+
+  assert(level >= 0) ;
+}
+
+int main(int argc, char* argv[]) {
+  indent_stack[0] = 0 ;
+  yylex() ;
+  printf("\n") ;
+}
