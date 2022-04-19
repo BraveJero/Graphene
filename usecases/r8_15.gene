@@ -4,4 +4,4 @@
 
 START:
     CREATE NODE<EMPTY> n;
-    INSERT INTO n INTEGER 0;
+    n.DATA <- 0

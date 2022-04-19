@@ -5,7 +5,8 @@
 START:
     CREATE DIGRAPH<INTEGER, EMPTY> g;
 
-    INTEGER ceil = 15;
+    CREATE INTEGER ceil;
+    INSERT INTO ceil INTEGER 15;
     FOR i FROM 1 TO ceil: // Arbol binario
         INSERT INTO g NODE ("Node " + i) WITH VALUE i;
         INTEGER parent = i/2;

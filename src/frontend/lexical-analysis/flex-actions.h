@@ -30,7 +30,70 @@ typedef enum TokenID {
 
 	// Tipos de dato.
 	INTEGER,
-	US_ASCII_TEXT
+	US_ASCII_TEXT,
+	START,
+	CREATE,
+	INSERT,
+	INTO,
+	FOR,
+	WHILE,
+	CHAR,
+	DECIMAL,
+	STRING,
+	NODE,
+	EDGE,
+	GRAPH,
+	FROM,
+	IF,
+	ELSE,
+	TO,
+	INCLUSIVE,
+	EXCLUSIVE,
+	WITH,
+	VALUE,
+	DFS,
+	BFS,
+	IS,
+	NOT,
+	EMPTY_TYPE,
+	POP,
+	ENTRY,
+	PRINT,
+	DEF,
+	LABEL,
+	GET,
+	IN,
+	EQ
+	LT,
+	GT,
+	GEQ,
+	LEQ,
+	AND,
+	OR,
+	RETURN,
+	DUMP,
+	GRAPHVIZ_DOT,
+	LET,
+	BE,
+	QUEUE,
+	STACK,
+	SET,
+	DIGRAPH,
+	INTEGER_TYPE,
+	ANY_TYPE,
+	DECIMAL_TYPE,
+	CHAR_TYPE,
+	STRING_TYPE,
+	OPEN_ANTILAMBDA,
+	CLOSE_ANTILAMBDA,
+	COMMA,
+	COLON,
+	DOT,
+	SEMICOLON,
+	LEFT_ARROW,
+	RIGHT_ARROW,
+	IDENTIFIER,
+	EOL,
 } TokenID;
 
 /**
@@ -40,12 +103,10 @@ typedef enum TokenID {
  * (a.k.a. DFA), como mecanismo de escaneo y reconocimiento.
  */
 
-TokenID IntegerPatternAction(const char * lexeme);
-
 void IgnoredPatternAction(const char * lexeme);
-
 TokenID UnknownPatternAction(const char * lexeme);
-
 TokenID StringPatternAction(const char * lexeme);
+TokenID IntegerPatternAction(const char * lexeme);
+TokenID DecimalPatternAction(const char * lexeme);
 
 #endif

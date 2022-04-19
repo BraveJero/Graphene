@@ -3,7 +3,7 @@
 # Crear un grafo de 10 nodos.
 
 START:
-    CREATE GRAPH g<EMPTY, EMPTY>;
+    CREATE GRAPH<EMPTY, EMPTY> g
 
     FOR i FROM 1 TO 10 INCLUSIVE:
-        INSERT INTO g NODE ("Node " + i);
+        INSERT INTO g NODE ("Node " + i)

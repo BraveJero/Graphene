@@ -7,21 +7,26 @@
  */
 
 TokenID IntegerPatternAction(const char * lexeme) {
-	LogDebug("IntegerPatternAction: '%s'.", lexeme);
+	printf("IntegerPatternAction: '%s'.", lexeme);
 	yylval = atoi(lexeme);
 	return INTEGER;
 }
 
 void IgnoredPatternAction(const char * lexeme) {
-	LogDebug("IgnoredPatternAction: '%s'.", lexeme);
+	printf("IgnoredPatternAction: '%s'.", lexeme);
 }
 
 TokenID UnknownPatternAction(const char * lexeme) {
-	LogDebug("UnknownPatternAction: '%s'.", lexeme);
+	printf("UnknownPatternAction: '%s'.", lexeme);
 	return YYUNDEF;
 }
 
 TokenID StringPatternAction(const char * lexeme) {
-	LogDebug("StringPatternAction: '%s'.", lexeme);
-	return US_ASCII_TEXT;
+	printf("StringPatternAction: '%s'.", lexeme);
+	return STRING;
+}
+
+TokenID DecimalPatternAction(const char * lexeme) {
+	printf("DecimalPatternAction: '%s'.", lexeme);
+	return DECIMAL;
 }
