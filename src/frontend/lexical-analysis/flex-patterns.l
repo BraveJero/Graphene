@@ -1,19 +1,18 @@
 %{
 
-#include "flex-actions.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 
+#include "flex-actions.h"
+
 #define MAX_DEPTH 72
 
-int nesting = 0 ;
-unsigned int indent_stack[MAX_DEPTH] ;
-unsigned int level = 0 ;
+unsigned int indent_level = 0;
+unsigned char flag_first = 1;
 
-unsigned int first = 1 ;
-
-void process_indent(char* line) ;
+char process_indent(TokenID* ans, char* line, unsigned int length);
+TokenID temp;
 
 %}
 
@@ -27,30 +26,35 @@ void process_indent(char* line) ;
 %option yylineno
 
 /* No distingue entre mayusculas y minusculas */
+%option case-insensitive
 %option caseless
 
 /* Estados para el procesamiento */
 %x COMMENT
 
 /* Patrones reutilizables. */
-alpha			[a-zA-Z]
-digit			[0-9]
-whitespace		[ \f\r\t\v]
-newline         \n
+alpha				[a-zA-Z]
+digit				[0-9]
+newline         	\n
+unused_whitespace	[ \f\r\t\v]
+whitespace			[ \f\n\r\t\v]
 
 %%
 #								{ BEGIN(COMMENT); }
 <COMMENT>.						{  }
 <COMMENT>\n						{ BEGIN(INITIAL); }
 
-^[ ]*\n       {/* Ignore blank lines. */}
-^[ ]*[^ \n]+  { int last = yyleng - 1;
-                process_indent(yytext) ;
-                while ((last >= 0) &&
-                      (yytext[last] != ' ')) {
-                unput(yytext[last]);
-                last-- ; }}
-
+^{whitespace}*\n				{ /* Ignore blank lines */ }
+^[ ]*[^ \n]+					{ printf("{%s}\n", yytext);
+									if ( process_indent(&temp, yytext, yyleng) )
+										return temp;
+								}
+<<EOF>>							{ printf("{%s}\n", yytext);
+									if ( process_indent(&temp, yytext, yyleng) )
+										return temp;
+									else
+										return 0;
+								}
 
 start							{ printf("{%s}\n", yytext); return START; }
 create							{ printf("{%s}\n", yytext); return CREATE; }
@@ -78,14 +82,13 @@ def								{ printf("{%s}\n", yytext); return DEF; }
 label							{ printf("{%s}\n", yytext); return LABEL; }
 get								{ printf("{%s}\n", yytext); return GET; }
 in								{ printf("{%s}\n", yytext); return IN; }
-equals							{ printf("{%s}\n", yytext); return EQUALS; }
 return							{ printf("{%s}\n", yytext); return RETURN; }
 dump							{ printf("{%s}\n", yytext); return DUMP; }
 dot							    { printf("{%s}\n", yytext); return GRAPHVIZ_DOT; }
 let							    { printf("{%s}\n", yytext); return LET; }
 be							    { printf("{%s}\n", yytext); return BE; }
 
-\'.\'							{ printf("{%s}\n", yytext); return CHAR; }
+\'([^\\]|\\.)\'					{ printf("{%s}\n", yytext); return CHAR; }
 true|false                      { printf("{%s}\n", yytext); return BOOLEAN; }
 {digit}+						{ printf("{%s}\n", yytext); return IntegerPatternAction(yytext); }
 {digit}+.{digit}                { printf("{%s}\n", yytext); return DecimalPatternAction(yytext); }
@@ -121,8 +124,8 @@ string							{ printf("{%s}\n", yytext); return STRING_TYPE; }
 and                             { printf("{%s}\n", yytext); return AND; }   
 or                              { printf("{%s}\n", yytext); return OR; } 
 
-"("								{ printf("{%s}\n", yytext); nesting++; return OPEN_PARENTHESIS; }
-")"								{ printf("{%s}\n", yytext); nesting--; return CLOSE_PARENTHESIS; }
+"("								{ printf("{%s}\n", yytext); return OPEN_PARENTHESIS; }
+")"								{ printf("{%s}\n", yytext); return CLOSE_PARENTHESIS; }
 "<"								{ printf("{%s}\n", yytext); return OPEN_ANTILAMBDA; }
 ">"								{ printf("{%s}\n", yytext); return CLOSE_ANTILAMBDA; }
 ","								{ printf("{%s}\n", yytext); return COMMA; }
@@ -136,49 +139,44 @@ or                              { printf("{%s}\n", yytext); return OR; }
 
 {newline}       				{ printf("{%s}\n", yytext); return EOL; }
 
-{whitespace}					{ printf("{%s}\n", yytext); /* IgnoredPatternAction(yytext); */ }
+{whitespace}					{ printf("IGNORE{%s}\n", yytext); /* IgnoredPatternAction(yytext); */ }
 
 .								{ printf("{%s}\n", yytext); return UnknownPatternAction(yytext); }
 
 %%
 
 unsigned int white_count(char* line) {
-  unsigned int count = 0 ;
-  while (*line == ' ')
-    count++, line++ ;
-  return count ;
+	unsigned int count = 0 ;
+	while (*line == ' ')
+		count++, line++ ;
+	printf("White count: %d\n", count);
+	return count;
 }
 
-void process_indent(char* line) {
-  if (nesting)
-    /* Ignore indents while nested. */
-    return ;
+char process_indent(TokenID* ans, char* line, unsigned int length) {
+	unsigned int curr_indent = white_count(line);
+	char * end_indent;
+	for (end_indent = line; *end_indent == ' ' || *end_indent == '\t'; end_indent++);
+	for (char * it = line + length - 1; it >= end_indent; it--) {
+		unput(*it);
+	}
 
-  unsigned int indent = white_count(line) ;
-
-  if (indent == indent_stack[level]) {
-    if (!first) printf(" ;") ;
-    first = 0 ;
-    return ;
-  }
-
-  if (indent > indent_stack[level]) {
-    printf(" {") ;
-    assert(level+1 < MAX_DEPTH) ;
-    indent_stack[++level] = indent ;
-    return ;
-  }
-
-  while (indent < indent_stack[level]) {
-    --level ;
-    printf(" }") ;
-  }
-
-  assert(level >= 0) ;
-}
-
-int main(int argc, char* argv[]) {
-  indent_stack[0] = 0 ;
-  yylex() ;
-  printf("\n") ;
+	if (curr_indent == indent_level) {
+		return 0;
+	} else if (curr_indent == indent_level + 4) {
+		printf("--------------------------------INDENT\n");
+		indent_level += 4;
+		*ans = INDENT;
+		return 1;
+	} else if ( (indent_level - curr_indent) % 4 == 0 ) {
+		indent_level -= 4;
+		printf("--------------------------------DEDENT\n");
+		for (int i = 0; i < curr_indent; i++) {
+			unput(' ');
+		}
+		unput('\n');
+		*ans = DEDENT;
+		return 1;
+	}
+	return 0;
 }

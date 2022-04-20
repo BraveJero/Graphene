@@ -8,7 +8,7 @@
 
 TokenID IntegerPatternAction(const char * lexeme) {
 	printf("IntegerPatternAction: '%s'.", lexeme);
-	yylval = atoi(lexeme);
+	// yylval = atoi(lexeme);
 	return INTEGER;
 }
 

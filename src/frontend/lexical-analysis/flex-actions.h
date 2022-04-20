@@ -64,7 +64,7 @@ typedef enum TokenID {
 	LABEL,
 	GET,
 	IN,
-	EQ
+	EQ,
 	LT,
 	GT,
 	GEQ,
@@ -82,6 +82,7 @@ typedef enum TokenID {
 	DIGRAPH,
 	INTEGER_TYPE,
 	ANY_TYPE,
+	BOOLEAN_TYPE,
 	DECIMAL_TYPE,
 	CHAR_TYPE,
 	STRING_TYPE,
@@ -95,6 +96,8 @@ typedef enum TokenID {
 	RIGHT_ARROW,
 	IDENTIFIER,
 	EOL,
+	INDENT,
+	DEDENT,
 } TokenID;
 
 /**
