@@ -14,26 +14,29 @@
 %token PRINT DEF LABEL GET IN EQUALS RETURN DUMP GRAPHVIZ_DOT
 %token INTEGER STRING CHAR DECIMAL BOOLEAN NODE EDGE GRAPH DIGRAPH EMPTY_TYPE QUEUE STACK SET 
 %token INTEGER_TYPE ANY_TYPE DECIMAL_TYPE CHAR_TYPE STRING_TYPE BOOLEAN_TYPE
-%token GT LT GEQ LEQ EQ AND OR
+%token GT LT GEQ LEQ EQ AND OR INDENT DEDENT
 %token OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_ANTILAMBDA CLOSE_ANTILAMBDA COMMA COLON DOT RIGHT_ARROW LEFT_ARROW IDENTIFIER EOL
 
 // Reglas de asociatividad y precedencia (de menor a mayor):
 %left ADD SUB
 %left MUL DIV
 
+%left AND
+%left OR
+
 %%
 
 program: function_defs start_def						{  }
 	;
 
-start_def: START COLON body								{  }
+start_def: START COLON EOL body								{ printf("Reconozco START"); }
 	;
 
 function_defs: 											{  }
 	| function_defs function_def						{  }
 	;
 
-function_def: DEF IDENTIFIER argument_def COLON body	{  }
+function_def: DEF IDENTIFIER argument_def COLON EOL body	{  }
 	;
 
 argument_def: OPEN_PARENTHESIS CLOSE_PARENTHESIS				{  }
@@ -47,39 +50,6 @@ argument_list: var_def											{  }
 var_def: data_type IDENTIFIER									{  }
 	;
 
-for_block: for_stmt COLON body
-	;
-
-for_stmt: FOR IDENTIFIER FROM INTEGER TO INTEGER
-	| FOR IDENTIFIER FROM INTEGER TO INTEGER INCLUSIVE
-	| FOR IDENTIFIER FROM INTEGER TO INTEGER EXCLUSIVE
-	| FOR IDENTIFIER IN 
-	;
-
-while_block: WHILE OPEN_PARENTHESIS condition CLOSE_PARENTHESIS COLON body
-	;
-
-if_block: IF OPEN_PARENTHESIS condition CLOSE_PARENTHESIS COLON body
-	| IF OPEN_PARENTHESIS condition CLOSE_PARENTHESIS COLON body ELSE COLON body
-	| IF OPEN_PARENTHESIS condition CLOSE_PARENTHESIS COLON body ELSE if_block
-	;
-
-condition: BOOLEAN
-	| value comparator value 
-	| value comparator prim_data_type_instance
-	| prim_data_type_instance comparator value
-	| prim_data_type_instance comparator prim_data_type_instance
-	| OPEN_PARENTHESIS condition CLOSE_PARENTHESIS AND OPEN_PARENTHESIS condition CLOSE_PARENTHESIS
-	| OPEN_PARENTHESIS condition CLOSE_PARENTHESIS OR OPEN_PARENTHESIS condition CLOSE_PARENTHESIS
-	| NOT OPEN_PARENTHESIS condition CLOSE_PARENTHESIS
-	;
-
-value: IDENTIFIER
-	| function_call
-	| prim_data_type_instance
-	| expression
-	;
-
 function_call: IDENTIFIER param_def
 	;
 
@@ -91,31 +61,75 @@ param_list: value											{  }
 	| param_list COMMA value								{  }
 	;
 
-comparator: GEQ
-	| LEQ
-	| GT
-	| LT
-	| EQ
-
-body: INDENT stmts DEDENT															{  }
+for_block: for_stmt COLON EOL body							{  }
 	;
 
-stmts: 																			{  }
-	| stmts stmt																{  }
+for_stmt: FOR IDENTIFIER FROM value TO value				{  }
+	| FOR IDENTIFIER FROM value TO value INCLUSIVE			{  }
+	| FOR IDENTIFIER FROM value TO value EXCLUSIVE			{  }
+	| FOR IDENTIFIER IN IDENTIFIER WITH iterator_type ENTRY node_instance	{  }
 	;
 
-stmt: create_stmt EOL																{  }
-	| insert_stmt EOL																	{  }
+iterator_type: BFS
+	| DFS
+	;
+
+while_block: WHILE condition COLON EOL body
+	;
+
+if_block: IF OPEN_PARENTHESIS condition CLOSE_PARENTHESIS COLON EOL body
+	| IF OPEN_PARENTHESIS condition CLOSE_PARENTHESIS COLON EOL body ELSE COLON EOL body
+	| IF OPEN_PARENTHESIS condition CLOSE_PARENTHESIS COLON EOL body ELSE if_block
+	;
+
+body: INDENT stmts DEDENT											{  }
+	;
+
+stmts:																{  }
+	| stmts stmt													{  }
+	;
+
+stmt: EOL															{  }
+	| for_block														{  }
+	| while_block													{  }
+	| if_block														{  }
+	| create_stmt EOL												{  }
+	| insert_stmt EOL												{  }
+	| let_be_stmt EOL												{  }
 	;
 
 create_stmt: CREATE extra_data_type IDENTIFIER									{  }
 	;
 
-insert_stmt: INSERT INTO IDENTIFIER VALUE							{ /* TODO: CHECK */ }
+insert_stmt: INSERT INTO IDENTIFIER data_type data_type_instance	{ /* TODO: CHECK */ }
 	;
 
 let_be_stmt: LET prim_data_type IDENTIFIER
 	| LET prim_data_type IDENTIFIER BE value
+
+
+condition: BOOLEAN
+	| OPEN_PARENTHESIS condition CLOSE_PARENTHESIS
+	| value comparator value
+	| value comparator prim_data_type_instance
+	| prim_data_type_instance comparator value
+	| prim_data_type_instance comparator prim_data_type_instance
+	| condition AND condition
+	| condition OR condition
+	| NOT condition
+	;
+
+value: IDENTIFIER
+	| function_call
+	| prim_data_type_instance
+	| expression
+	;
+
+comparator: GEQ
+	| LEQ
+	| GT
+	| LT
+	| EQ
 
 data_type: prim_data_type										{  }
 	| extra_data_type											{  }
@@ -146,7 +160,7 @@ edge_type: EDGE OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA							{  }
 graph_type: GRAPH OPEN_ANTILAMBDA prim_data_type COMMA prim_data_type CLOSE_ANTILAMBDA	{  }
 	;
 
-digraph_type: GRAPH OPEN_ANTILAMBDA prim_data_type COMMA prim_data_type CLOSE_ANTILAMBDA	{  }
+digraph_type: DIGRAPH OPEN_ANTILAMBDA prim_data_type COMMA prim_data_type CLOSE_ANTILAMBDA	{  }
 	;
 
 set_type: SET OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA							{  }
@@ -158,7 +172,11 @@ stack_type: STACK OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA						{  }
 queue_type: QUEUE OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA						{  }
 	;
 
-prim_data_type_instance: string									{  }
+data_type_instance: prim_data_type_instance
+	| extra_data_type_instance
+	;
+
+prim_data_type_instance: string_instance						{  }
 	| CHAR														{  }
 	| INTEGER													{  }
 	| DECIMAL													{  }
@@ -169,22 +187,24 @@ extra_data_type_instance: node_instance
 	| edge_instance
 	;
 
-node_instance: OPEN_PARENTHESIS string CLOSE_PARENTHESIS
-	| OPEN_PARENTHESIS string COMMA prim_data_type_instance CLOSE_PARENTHESIS
+node_instance: OPEN_PARENTHESIS string_instance CLOSE_PARENTHESIS
+	| OPEN_PARENTHESIS string_instance COMMA prim_data_type_instance CLOSE_PARENTHESIS
 	;
 
-edge_instance: OPEN_PARENTHESIS string RIGHT_ARROW string CLOSE_PARENTHESIS
-	| OPEN_PARENTHESIS string RIGHT_ARROW string COMMA prim_data_type_instance CLOSE_PARENTHESIS
+edge_instance: OPEN_PARENTHESIS string_instance RIGHT_ARROW string_instance CLOSE_PARENTHESIS
+	| OPEN_PARENTHESIS string_instance RIGHT_ARROW string_instance COMMA prim_data_type_instance CLOSE_PARENTHESIS
 	;
 
-string: STRING													{  }
-	| STRING ADD CHAR											{  }
-	| CHAR ADD STRING											{  }
-	| STRING ADD STRING											{  }
-	| STRING ADD INTEGER										{  }
-	| INTEGER ADD STRING										{  }
-	| STRING ADD DECIMAL										{  }
-	| DECIMAL ADD STRING										{  }
+values: STRING;
+
+string_instance: STRING													{  }
+	| string_instance ADD CHAR											{  }
+	| CHAR ADD string_instance											{  }
+	| string_instance ADD string_instance								{  }
+	| string_instance ADD INTEGER										{  }
+	| INTEGER ADD string_instance										{  }
+	| string_instance ADD DECIMAL										{  }
+	| DECIMAL ADD string_instance										{  }
 	;
 
 expression: expression ADD expression							{ /* $$ = AdditionExpressionGrammarAction($1, $3); */ }

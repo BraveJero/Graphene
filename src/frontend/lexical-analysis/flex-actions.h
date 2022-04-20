@@ -108,9 +108,14 @@ typedef enum TokenID {
  */
 
 void IgnoredPatternAction(const char * lexeme);
+TokenID KeywordPatternAction(const char * lexeme, TokenID token);
 TokenID UnknownPatternAction(const char * lexeme);
+TokenID BooleanPatternAction(const char * lexeme, char value);
+TokenID CharPatternAction(const char * lexeme);
 TokenID StringPatternAction(const char * lexeme);
 TokenID IntegerPatternAction(const char * lexeme);
 TokenID DecimalPatternAction(const char * lexeme);
+TokenID IndentationPatternAction(TokenID token);
+TokenID EndOfLinePatternAction(TokenID token);
 
 #endif
