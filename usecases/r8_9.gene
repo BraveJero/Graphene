@@ -3,14 +3,16 @@
 # Almacenar un grafo en un archivo.
 
 START:
-    CREATE DIGRAPH<INTEGER, EMPTY> g;
+    CREATE DIGRAPH<INTEGER, EMPTY> g
 
-    INSERT INTO ceil INTEGER 17;
-    FOR i FROM 1 TO ceil: # Arbol binario
-        INSERT INTO g NODE<INTEGER> ("Node " + i);
-        INSERT INTO parent INTEGER i/2;
+    LET ceil BE INTEGER
+    ceil <- 17
+    FOR i FROM 1 TO ceil:
+        INSERT INTO g NODE<INTEGER> ("Node " + i, i)
+        LET parent BE INTEGER
+        parent <- i/2
         IF parent >= 1:
-            INSERT INTO g EDGE<EMPTY> ("Node " + parent -> "Node " + i);
+            INSERT INTO g EDGE<EMPTY> ("Node " + parent -> "Node " + i)
 
-    DUMP g IN FILE "graph.out";
+    DUMP g IN "graph.out"
 

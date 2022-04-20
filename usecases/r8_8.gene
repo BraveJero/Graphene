@@ -3,13 +3,17 @@
 # Crear un grafo, e imprimir el contenido en sus aristas (ignorar el contenido en los nodos).
 
 START:
-    CREATE DIGRAPH<EMPTY, INTEGER> g;
+    CREATE DIGRAPH<EMPTY, INTEGER> g
 
-    INSERT INTO ceil INTEGER 17;
-    FOR i FROM 1 TO ceil: # Arbol binario
-        INSERT INTO g NODE<EMPTY> ("Node " + i);
-        INSERT INTO parent INTEGER i/2;
+    LET ceil BE INTEGER
+    ceil <- 17
+
+    FOR i FROM 1 TO ceil:
+        INSERT INTO g NODE<EMPTY> ("Node " + i)
+        LET parent BE INTEGER
+        parent <- i/2
         IF parent >= 1:
-            INSERT INTO g EDGE<INTEGER> ("Node " + parent -> "Node " + i, i);
+            INSERT INTO g EDGE<INTEGER> ("Node " + parent -> "Node " + i, i)
 
-    PRINT g.edges;
+    FOR e IN g.edges:
+        PRINT e.data

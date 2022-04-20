@@ -3,12 +3,13 @@
 # Crear un árbol de 15 nodos, cuyos nodos alberguen un número.
 
 START:
-    CREATE DIGRAPH<INTEGER, EMPTY> g;
+    CREATE DIGRAPH<INTEGER, EMPTY> g
 
-    CREATE INTEGER ceil;
-    INSERT INTO ceil INTEGER 15;
-    FOR i FROM 1 TO ceil: // Arbol binario
-        INSERT INTO g NODE ("Node " + i) WITH VALUE i;
-        INTEGER parent = i/2;
+    LET ceil BE INTEGER
+    ceil <- 15
+    FOR i FROM 1 TO ceil:
+        INSERT INTO g NODE ("Node " + i, i)
+        LET parent BE INTEGER
+        parent <- i/2
         IF parent >= 1:
-            INSERT INTO g EDGE ("Node " + parent, "Node " + i);
+            INSERT INTO g EDGE ("Node " + parent -> "Node " + i)

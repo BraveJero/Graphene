@@ -3,12 +3,12 @@
 # Crear 2 conjuntos de nodos, y obtener un único grafo desde ellos.
 
 START:
-    CREATE SET<NODE<EMPTY>> s1;
-    INSERT INTO s1 NODE ("1");
+    CREATE SET<STRING> s1
+    INSERT INTO s1 STRING "1"
 
-    CREATE SET<NODE<EMPTY>> s2;
-    INSERT INTO s1 NODE ("3");
+    CREATE SET<STRING> s2
+    INSERT INTO s1 STRING "3"
 
-    CREATE GRAPH<EMTPY, EMPTY> g;
-    INSERT INTO g SET<NODE<EMPTY>> s1;
-    INSERT INTO g SET<NODE<EMPTY>> s2;
+    CREATE GRAPH<EMPTY, EMPTY> g
+    INSERT INTO g SET<STRING> s1
+    INSERT INTO g SET<STRING> s2

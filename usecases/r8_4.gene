@@ -3,13 +3,13 @@
 # Crear dos grafos, y agregar una arista entre ellos para crear un nuevo grafo conexo.
 
 START:
-    CREATE DIGRAPH g1<EMPTY, EMPTY>;
-    INSERT INTO g1 NODE ("1");
-    CREATE GRAPH g2<EMPTY, EMPTY>;
-    INSERT INTO g2 NODE ("2");
+    CREATE DIGRAPH<EMPTY, EMPTY> g1
+    INSERT INTO g1 NODE ("1")
+    CREATE GRAPH<EMPTY, EMPTY> g2
+    INSERT INTO g2 NODE ("2")
 
-    CREATE GRAPH g3<EMPTY, EMPTY>;
-    INSERT INTO g3 GRAPH g1;
-    INSERT INTO g3 GRAPH g2;
+    CREATE GRAPH<EMPTY, EMPTY> g3
+    INSERT INTO g3 GRAPH g1
+    INSERT INTO g3 GRAPH g2
 
-    INSERT INTO g3 EDGE ("1" -> "2");
+    INSERT INTO g3 EDGE ("1" -> "2")
