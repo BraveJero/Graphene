@@ -44,14 +44,18 @@ whitespace			[ \f\n\r\t\v]
 <COMMENT>\n						{ BEGIN(INITIAL); }
 
 ^{whitespace}*\n				{ /* Ignore blank lines */ }
-^[ ]*[^ \n]+					{ if ( process_indent(&temp, yytext, yyleng) )
-										return temp;
-								}
-<<EOF>>							{ if ( process_indent(&temp, yytext, 0) )
+^[ ]*[^ \n]+					{ if ( process_indent(&temp, yytext, yyleng) ) {
+									/* printf("Indenting%d...\n", temp); */
 									return temp;
-								else
-									return 0;
+								} }
+<<EOF>>							{ if ( process_indent(&temp, yytext, 0) ) {
+									/* printf("Indenting%d...\n", temp); */
+									return temp;
 								}
+								else {
+									/* printf("GUSBAI\n"); */
+									return 0;
+								} }
 
 start							{ return KeywordPatternAction(yytext, START); }
 create							{ return KeywordPatternAction(yytext, CREATE); }
@@ -86,6 +90,8 @@ let							    { return KeywordPatternAction(yytext, LET); }
 be							    { return KeywordPatternAction(yytext, BE); }
 node							{ return KeywordPatternAction(yytext, NODE); }
 edge							{ return KeywordPatternAction(yytext, EDGE); }
+edges							{ return KeywordPatternAction(yytext, EDGES); }
+nodes							{ return KeywordPatternAction(yytext, NODES); }
 queue							{ return KeywordPatternAction(yytext, QUEUE); }
 stack							{ return KeywordPatternAction(yytext, STACK); }
 set								{ return KeywordPatternAction(yytext, SET); }
@@ -99,6 +105,8 @@ char							{ return KeywordPatternAction(yytext, CHAR_TYPE); }
 string							{ return KeywordPatternAction(yytext, STRING_TYPE); }
 and                             { return KeywordPatternAction(yytext, AND); }
 or                              { return KeywordPatternAction(yytext, OR); }
+data                            { return KeywordPatternAction(yytext, DATA); }
+as                            { return KeywordPatternAction(yytext, AS); }
 "<<"                            { return KeywordPatternAction(yytext, LT); }
 ">>"                            { return KeywordPatternAction(yytext, GT); }
 "<="                            { return KeywordPatternAction(yytext, LEQ); }
@@ -126,7 +134,7 @@ true							{ return BooleanPatternAction(yytext, 1); }
 {digit}+.{digit}                { return DecimalPatternAction(yytext); }
 \"(\\.|[^\"\\])*\"				{ return StringPatternAction(yytext); }
 
-({alpha}|_)({alpha}|_|{digit})*	{ return KeywordPatternAction(yytext, IDENTIFIER); }
+({alpha}|_)({alpha}|_|{digit})*	{ return IdentifierPatternAction(yytext); }
 
 {newline}       				{ return KeywordPatternAction(yytext, EOL); }
 
@@ -167,13 +175,10 @@ char process_indent(TokenID* ans, char* line, unsigned int length) {
 		for (int i = 0; i < curr_indent; i++) {
 			unput(' ');
 		}
-		unput('\n');
+		if (indent_level != curr_indent)
+			unput('\n');
 		*ans = IndentationPatternAction(DEDENT);
 		return 1;
 	}
 	return 0;
 }
-
-/*
-
-*/

@@ -16,25 +16,25 @@ TokenID UnknownPatternAction(const char * lexeme) {
 }
 
 TokenID KeywordPatternAction(const char * lexeme, TokenID token) {
-	LogDebug("KeywordPatternAction: '%s'.\n", lexeme);
+	LogDebug("KeywordPatternAction: '%s' with %d.\n", lexeme, token);
 	return token;
 }
 
 TokenID BooleanPatternAction(const char * lexeme, char value) {
 	LogDebug("BooleanPatternAction: '%s'.\n", lexeme);
-	// yylval = value;
+	yylval = value;
 	return BOOLEAN;
 }
 
 TokenID CharPatternAction(const char * lexeme) {
 	LogDebug("CharPatternAction: '%s'.\n", lexeme);
-	// yylval = *lexeme;
+	yylval = *lexeme;
 	return CHAR;
 }
 
 TokenID IntegerPatternAction(const char * lexeme) {
 	LogDebug("IntegerPatternAction: '%s'.\n", lexeme);
-	// yylval = atoi(lexeme);
+	yylval = atoi(lexeme);
 	return INTEGER;
 }
 
@@ -48,9 +48,14 @@ TokenID DecimalPatternAction(const char * lexeme) {
 	return DECIMAL;
 }
 
+TokenID IdentifierPatternAction(const char * lexeme) {
+	LogDebug("IdentifierPatternAction: '%s'.\n", lexeme);
+	return IDENTIFIER;
+}
+
 TokenID IndentationPatternAction(TokenID token) {
 	LogDebug("IndentationPatternAction: '%s'.\n", (token == INDENT) ? "INDENT" : "DEDENT");
-	return DECIMAL;
+	return token;
 }
 
 TokenID EndOfLinePatternAction(TokenID token) {

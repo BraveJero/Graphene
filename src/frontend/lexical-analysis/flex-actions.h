@@ -98,6 +98,10 @@ typedef enum TokenID {
 	EOL,
 	INDENT,
 	DEDENT,
+	DATA,
+	EDGES,
+	NODES,
+	AS,
 } TokenID;
 
 /**
@@ -115,6 +119,7 @@ TokenID CharPatternAction(const char * lexeme);
 TokenID StringPatternAction(const char * lexeme);
 TokenID IntegerPatternAction(const char * lexeme);
 TokenID DecimalPatternAction(const char * lexeme);
+TokenID IdentifierPatternAction(const char * lexeme);
 TokenID IndentationPatternAction(TokenID token);
 TokenID EndOfLinePatternAction(TokenID token);
 
