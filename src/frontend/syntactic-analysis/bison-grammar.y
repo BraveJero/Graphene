@@ -92,6 +92,9 @@
 // Reglas de asociatividad y precedencia (de menor a mayor):
 %left ADD SUB
 %left MUL DIV
+%left AND OR
+%right NOT
+%left DOT
 
 %%
 
@@ -146,7 +149,6 @@ condition: BOOLEAN											{ printf("GRAMMAR: condition: BOOLEAN\n"); }
 	| condition AND condition								{ printf("GRAMMAR: condition: condition AND condition\n"); }
 	| condition OR condition								{ printf("GRAMMAR: condition: condition OR condition\n"); }
 	| NOT condition											{ printf("GRAMMAR: condition: NOT condition\n"); }
-	| OPEN_PARENTHESIS condition CLOSE_PARENTHESIS			{ printf("GRAMMAR: condition: OPEN_PARENTHESIS condition CLOSE_PARENTHESIS\n"); }
 	| IDENTIFIER IS EMPTY_TYPE								{ printf("GRAMMAR: condition: IDENTIFIER IS EMPTY_TYPE\n"); }
 	| IDENTIFIER IS NOT EMPTY_TYPE							{ printf("GRAMMAR: condition: IDENTIFIER IS NOT EMPTY_TYPE\n"); }
 	;
