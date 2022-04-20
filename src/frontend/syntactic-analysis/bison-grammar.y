@@ -95,7 +95,7 @@
 
 %%
 
-program: function_defs start_def								{ printf("GRAMMAR: program: f_defs start_def\n"); /* $$ = ProgramGrammarAction($1); */ }
+program: function_defs start_def								{ printf("GRAMMAR: program: f_defs start_def\n"); $$ = ProgramGrammarAction(0); }
 	;
 
 start_def: START COLON EOL body									{ printf("GRAMMAR: start_def: START COLON EOL body\n"); }
