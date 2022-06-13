@@ -90,6 +90,9 @@
 %right NOT
 %left DOT
 
+// El simbolo inicial de la gramatica
+%start program
+
 %%
 
 program: function_defs start_def								{ printf("GRAMMAR: program: f_defs start_def\n"); $$ = ProgramGrammarAction(0); }
