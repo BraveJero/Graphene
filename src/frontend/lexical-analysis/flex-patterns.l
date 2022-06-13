@@ -70,7 +70,6 @@ to								{ return KeywordPatternAction(yytext, TO); }
 inclusive						{ return KeywordPatternAction(yytext, INCLUSIVE); }
 exclusive						{ return KeywordPatternAction(yytext, TO); }
 with							{ return KeywordPatternAction(yytext, WITH); }
-value							{ return KeywordPatternAction(yytext, VALUE); }
 dfs                             { return KeywordPatternAction(yytext, DFS); }
 bfs                             { return KeywordPatternAction(yytext, BFS); }
 is								{ return KeywordPatternAction(yytext, IS); }
@@ -80,8 +79,6 @@ pop								{ return KeywordPatternAction(yytext, POP); }
 entry							{ return KeywordPatternAction(yytext, ENTRY); }
 print							{ return KeywordPatternAction(yytext, PRINT); }
 def								{ return KeywordPatternAction(yytext, DEF); }
-label							{ return KeywordPatternAction(yytext, LABEL); }
-get								{ return KeywordPatternAction(yytext, GET); }
 in								{ return KeywordPatternAction(yytext, IN); }
 return							{ return KeywordPatternAction(yytext, RETURN); }
 dump							{ return KeywordPatternAction(yytext, DUMP); }
@@ -98,7 +95,6 @@ set								{ return KeywordPatternAction(yytext, SET); }
 graph							{ return KeywordPatternAction(yytext, GRAPH); }
 digraph							{ return KeywordPatternAction(yytext, DIGRAPH); }
 integer							{ return KeywordPatternAction(yytext, INTEGER_TYPE); }
-any								{ return KeywordPatternAction(yytext, ANY_TYPE); }
 boolean                         { return KeywordPatternAction(yytext, BOOLEAN_TYPE); }
 decimal							{ return KeywordPatternAction(yytext, DECIMAL_TYPE); }
 char							{ return KeywordPatternAction(yytext, CHAR_TYPE); }
@@ -106,7 +102,7 @@ string							{ return KeywordPatternAction(yytext, STRING_TYPE); }
 and                             { return KeywordPatternAction(yytext, AND); }
 or                              { return KeywordPatternAction(yytext, OR); }
 data                            { return KeywordPatternAction(yytext, DATA); }
-as                            { return KeywordPatternAction(yytext, AS); }
+as								{ return KeywordPatternAction(yytext, AS); }
 "<<"                            { return KeywordPatternAction(yytext, LT); }
 ">>"                            { return KeywordPatternAction(yytext, GT); }
 "<="                            { return KeywordPatternAction(yytext, LEQ); }
@@ -119,7 +115,6 @@ as                            { return KeywordPatternAction(yytext, AS); }
 ","								{ return KeywordPatternAction(yytext, COMMA); }
 ":"								{ return KeywordPatternAction(yytext, COLON); }
 "."								{ return KeywordPatternAction(yytext, DOT); }
-";"								{ return KeywordPatternAction(yytext, SEMICOLON); }
 "<-"						    { return KeywordPatternAction(yytext, LEFT_ARROW); }
 "->"						    { return KeywordPatternAction(yytext, RIGHT_ARROW); }
 "+"						    	{ return KeywordPatternAction(yytext, ADD); }
@@ -131,7 +126,7 @@ false							{ return BooleanPatternAction(yytext, 0); }
 true							{ return BooleanPatternAction(yytext, 1); }
 \'([^\\]|\\.)\'					{ return CharPatternAction(yytext); }
 {digit}+						{ return IntegerPatternAction(yytext); }
-{digit}+.{digit}                { return DecimalPatternAction(yytext); }
+{digit}+\.{digit}*				{ return DecimalPatternAction(yytext); }
 \"(\\.|[^\"\\])*\"				{ return StringPatternAction(yytext); }
 
 ({alpha}|_)({alpha}|_|{digit})*	{ return IdentifierPatternAction(yytext); }

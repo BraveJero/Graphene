@@ -16,7 +16,6 @@
 
 // Tipos de dato
 %token	INTEGER
-%token	US_ASCII_TEXT
 %token	START
 %token	CREATE
 %token	INSERT
@@ -37,7 +36,6 @@
 %token	INCLUSIVE
 %token	EXCLUSIVE
 %token	WITH
-%token	VALUE
 %token	DFS
 %token	BFS
 %token	IS
@@ -47,8 +45,6 @@
 %token	ENTRY
 %token	PRINT
 %token	DEF
-%token	LABEL
-%token	GET
 %token	IN
 %token	EQ
 %token	LT
@@ -67,7 +63,6 @@
 %token	SET
 %token	DIGRAPH
 %token	INTEGER_TYPE
-%token	ANY_TYPE
 %token	BOOLEAN_TYPE
 %token	DECIMAL_TYPE
 %token	CHAR_TYPE
@@ -77,7 +72,6 @@
 %token	COMMA
 %token	COLON
 %token	DOT
-%token	SEMICOLON
 %token	LEFT_ARROW
 %token	RIGHT_ARROW
 %token	IDENTIFIER
