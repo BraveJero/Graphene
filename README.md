@@ -29,16 +29,12 @@ En un entorno _Microsoft Windows_, en lugar de ejecutar el comando `make`, se de
 
 ## Ejecución
 
-Para compilar un programa, primero cree un archivo vacío denominado `program` con el siguiente contenido:
+Como ejemplo, puede compilar el archivo de ejemplo denominado `program`.
 
-```
-123123 + 123 - 2 * (454 + 890 / 89)
-```
-
-Luego, ejecute el compilador desde el directorio raíz del proyecto, inyectando el programa desde la entrada estándard:
+Ejecute el compilador desde el directorio raíz del proyecto, inyectando el programa desde la entrada estándar:
 
 ```bash
 user@machine:path/ $ cat program | bin/Compiler
 ```
 
-Deberia obtener el resultado correcto de evaluar el programa anterior: `122318`.
+Deberia obtener el resultado correcto de evaluar el programa anterior: `program.c`.
