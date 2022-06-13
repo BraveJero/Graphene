@@ -43,20 +43,6 @@ whitespace			[ \f\n\r\t\v]
 <COMMENT>.*						{ CommentPatternAction(yytext); }
 <COMMENT>\n						{ BEGIN(INITIAL); }
 
-^{whitespace}*\n				{ /* Ignore blank lines */ }
-^[ ]*[^ \n]+					{ if ( process_indent(&temp, yytext, yyleng) ) {
-									/* printf("Indenting%d...\n", temp); */
-									return temp;
-								} }
-<<EOF>>							{ if ( process_indent(&temp, yytext, 0) ) {
-									/* printf("Indenting%d...\n", temp); */
-									return temp;
-								}
-								else {
-									/* printf("GUSBAI\n"); */
-									return 0;
-								} }
-
 start							{ return KeywordPatternAction(yytext, START); }
 create							{ return KeywordPatternAction(yytext, CREATE); }
 insert							{ return KeywordPatternAction(yytext, INSERT); }
@@ -131,9 +117,23 @@ true							{ return BooleanPatternAction(yytext, 1); }
 
 ({alpha}|_)({alpha}|_|{digit})*	{ return IdentifierPatternAction(yytext); }
 
+^{whitespace}*\n				{ /* Ignore blank lines */ }
+^[ ]*[^ \n]+					{ if ( process_indent(&temp, yytext, yyleng) ) {
+									/* printf("Indenting%d...\n", temp); */
+									return temp;
+								} }
+<<EOF>>							{ if ( process_indent(&temp, yytext, 0) ) {
+									/* printf("Indenting%d...\n", temp); */
+									return temp;
+								}
+								else {
+									/* printf("GUSBAI\n"); */
+									return 0;
+								} }
+
 {newline}       				{ return KeywordPatternAction(yytext, EOL); }
 
-{whitespace}|"\0"				{ IgnoredPatternAction(yytext); }
+{whitespace}					{ IgnoredPatternAction(yytext); }
 
 .								{ return UnknownPatternAction(yytext); }
 
