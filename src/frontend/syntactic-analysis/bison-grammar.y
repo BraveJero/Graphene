@@ -208,6 +208,7 @@ insert_stmt: INSERT INTO IDENTIFIER data_type value							{ printf("GRAMMAR: ins
 	;
 
 return_stmt: RETURN value													{ printf("GRAMMAR: return_stmt: RETURN value\n"); }
+	| RETURN													{ printf("GRAMMAR: return_stmt: RETURN\n"); }
 	;
 
 let_be_stmt: LET IDENTIFIER BE prim_data_type								{ printf("GRAMMAR: let_be_stmt: LET IDENTIFIER BE prim_data_type\n"); }
