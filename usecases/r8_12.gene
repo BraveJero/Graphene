@@ -3,4 +3,4 @@
 # Imprimir un grafo inexistente.
 
 START:
-    PRINT g;
+    PRINT g
