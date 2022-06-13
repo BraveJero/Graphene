@@ -3,8 +3,8 @@
 # Realizar un cómputo entre grafos usando operadores que no están definidos sobre los mismos.
 
 START:
-    CREATE GRAPH<EMPTY, EMPTY> g1;
-    CREATE GRAPH<EMPTY, EMPTY> g2;
+    CREATE GRAPH<EMPTY, EMPTY> g1
+    CREATE GRAPH<EMPTY, EMPTY> g2
 
-    CREATE GRAPH <EMPTY, EMPTY> g3;
-    INSERT INTO g3 GRAPH g1 * g2;
+    CREATE GRAPH <EMPTY, EMPTY> g3
+    INSERT INTO g3 GRAPH g1 * g2

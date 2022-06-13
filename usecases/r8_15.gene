@@ -3,5 +3,5 @@
 # Asignar a un nodo que albergue un tipo de dato, un valor de otro tipo incompatible.
 
 START:
-    CREATE NODE<EMPTY> n;
+    CREATE NODE<EMPTY> n
     n.DATA <- 0

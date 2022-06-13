@@ -3,5 +3,5 @@
 # Intentar imprimir un conjunto de aristas en lugar de un grafo.
 
 START:
-    CREATE SET<EDGES<EMPTY>> edges;
-    PRINT edges;
+    CREATE SET<EDGES<EMPTY>> edges
+    PRINT edges
