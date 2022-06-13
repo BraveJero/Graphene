@@ -15,4 +15,4 @@ START:
             INSERT INTO g EDGE ("Node " + parent -> "Node " + i)
 
     FOR n IN g WITH BFS ENTRY ("Node 1"):
-        PRINT n
+        PRINT n.DATA

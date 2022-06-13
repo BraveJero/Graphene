@@ -4,9 +4,8 @@
 
 DEF SET<STRING> nodesWithKeyword(GRAPH<STRING, STRING> g, STRING label0, STRING keyword):
     CREATE SET<STRING> s
-    CREATE NODE n0
-    FOR n IN g WITH BFS ENTRY (n0):
-        IF n.data == keyword:
+    FOR n IN g WITH BFS ENTRY (label0):
+        IF n.DATA == keyword:
             INSERT INTO s STRING n
     
     RETURN s
@@ -20,7 +19,6 @@ START:
     INSERT INTO g EDGE ("A" -> "B")
     INSERT INTO g EDGE ("A" -> "C")
 
-    CREATE SET<STRING> s
     FOR n IN nodesWithKeyword(g, ("1"), "1"):
-        PRINT s
+        PRINT n
         # > [("1", "1"), ("uno", "1")]

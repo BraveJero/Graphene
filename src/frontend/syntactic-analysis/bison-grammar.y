@@ -95,34 +95,34 @@
 
 %%
 
-program: function_defs start_def								{ printf("GRAMMAR: program: f_defs start_def\n"); $$ = ProgramGrammarAction(0); }
+program: function_definitions start_definition								{ printf("GRAMMAR: program: f_definitions start_definition\n"); $$ = ProgramGrammarAction(0); }
 	;
 
-start_def: START COLON EOL body									{ printf("GRAMMAR: start_def: START COLON EOL body\n"); }
+start_definition: START COLON EOL body									{ printf("GRAMMAR: start_definition: START COLON EOL body\n"); }
 	;
 
-function_defs: 													{  }
-	| function_defs function_def								{  }
+function_definitions: 													{  }
+	| function_definitions function_definition								{  }
 	;
 
-function_def: DEF data_type IDENTIFIER argument_def COLON EOL body			{ printf("GRAMMAR: functino_def: DEF data_type IDENTIFIER argument_def COLON BODY\n"); }
+function_definition: DEF data_type IDENTIFIER argument_definition COLON EOL body			{ printf("GRAMMAR: functino_definition: DEF data_type IDENTIFIER argument_definition COLON BODY\n"); }
 	;
 
-argument_def: OPEN_PARENTHESIS CLOSE_PARENTHESIS				{  }
+argument_definition: OPEN_PARENTHESIS CLOSE_PARENTHESIS				{  }
 	| OPEN_PARENTHESIS argument_list CLOSE_PARENTHESIS			{  }
 	;
 
-argument_list: var_def											{  }
-	| argument_list COMMA var_def								{  }
+argument_list: variable_definition											{  }
+	| argument_list COMMA variable_definition								{  }
 	;
 
-var_def: data_type IDENTIFIER									{  }
+variable_definition: data_type IDENTIFIER									{  }
 	;
 
-for_block: for_stmt COLON EOL body
+for_block: for_statement COLON EOL body
 	;
 
-for_stmt: FOR IDENTIFIER FROM value TO value
+for_statement: FOR IDENTIFIER FROM value TO value
 	| FOR IDENTIFIER FROM value TO value INCLUSIVE
 	| FOR IDENTIFIER FROM value TO value EXCLUSIVE
 	| FOR IDENTIFIER IN value
@@ -163,10 +163,10 @@ value: IDENTIFIER											{ printf("GRAMMAR: value: IDENTIFIER\n"); }
 	| value DOT NODES											
 	;
 
-function_call: IDENTIFIER param_def							{ printf("GRAMMAR: function_call IDENTIFIER param_def\n"); }
+function_call: IDENTIFIER param_definition							{ printf("GRAMMAR: function_call IDENTIFIER param_definition\n"); }
 	;
 
-param_def: OPEN_PARENTHESIS CLOSE_PARENTHESIS				{  }
+param_definition: OPEN_PARENTHESIS CLOSE_PARENTHESIS				{  }
 	| OPEN_PARENTHESIS param_list CLOSE_PARENTHESIS			{  }
 	;
 
@@ -181,57 +181,60 @@ comparator: GEQ
 	| EQ
 	;
 
-body: INDENT stmts DEDENT														{ printf("GRAMMAR: body: INDENT stmts DEDENT\n"); }
+body: INDENT statements DEDENT														{ printf("GRAMMAR: body: INDENT statements DEDENT\n"); }
 	;
 
-stmts: 																			{ printf("GRAMMAR: stmts: ''\n"); }
-	| stmts stmt																{ printf("GRAMMAR: stmts: stmts stmt\n"); }
+statements: 																			{ printf("GRAMMAR: statements: ''\n"); }
+	| statements statement																{ printf("GRAMMAR: statements: statements statement\n"); }
 	;
 
-stmt: EOL																		{ printf("GRAMMAR: stmt: EOL\n"); }
-	| for_block																	{ printf("GRAMMAR: stmt: for_block\n"); }
-	| if_block																	{ printf("GRAMMAR: stmt: if_block\n"); }
-	| while_block																	{ printf("GRAMMAR: stmt: while_block\n"); }
-	| create_stmt EOL															{  }
-	| insert_stmt EOL															{  }
-	| return_stmt EOL															{ printf("GRAMMAR: stmt: rtn_stmt\n"); }
-	| let_be_stmt EOL															{ printf("GRAMMAR: stmt: let_be_stmt\n"); }
-	| assignment_stmt EOL														{ printf("GRAMMAR: stmt: assignemnt_stmt\n"); }
-	| print_stmt EOL															{ printf("GRAMMAR: stmt: print_stmt\n"); }
-	| dump_stmt EOL															{ printf("GRAMMAR: stmt: dump_stmt\n"); }
+statement: EOL																		{ printf("GRAMMAR: statement: EOL\n"); }
+	| for_block																	{ printf("GRAMMAR: statement: for_block\n"); }
+	| if_block																	{ printf("GRAMMAR: statement: if_block\n"); }
+	| while_block																	{ printf("GRAMMAR: statement: while_block\n"); }
+	| create_statement EOL															{  }
+	| insert_statement EOL															{  }
+	| return_statement EOL															{ printf("GRAMMAR: statement: rtn_statement\n"); }
+	| let_be_statement EOL															{ printf("GRAMMAR: statement: let_be_statement\n"); }
+	| assignment_statement EOL														{ printf("GRAMMAR: statement: assignemnt_statement\n"); }
+	| print_statement EOL															{ printf("GRAMMAR: statement: print_statement\n"); }
+	| dump_statement EOL															{ printf("GRAMMAR: statement: dump_statement\n"); }
 	;
 
-create_stmt: CREATE extra_data_type IDENTIFIER									{  }
+create_statement: CREATE extra_data_type IDENTIFIER									{  }
+	| CREATE collection_type IDENTIFIER
 	;
 
-insert_stmt: INSERT INTO IDENTIFIER data_type value							{ printf("GRAMMAR: insert_stmt: INSERT INTO IDENTIFIER data_type value\n"); }
+insert_statement: INSERT INTO IDENTIFIER data_type value							{ printf("GRAMMAR: insert_statement: INSERT INTO IDENTIFIER data_type value\n"); }
 	;
 
-return_stmt: RETURN value													{ printf("GRAMMAR: return_stmt: RETURN value\n"); }
-	| RETURN													{ printf("GRAMMAR: return_stmt: RETURN\n"); }
+return_statement: RETURN value													{ printf("GRAMMAR: return_statement: RETURN value\n"); }
+	| RETURN													{ printf("GRAMMAR: return_statement: RETURN\n"); }
 	;
 
-let_be_stmt: LET IDENTIFIER BE prim_data_type								{ printf("GRAMMAR: let_be_stmt: LET IDENTIFIER BE prim_data_type\n"); }
+let_be_statement: LET IDENTIFIER BE primitive_data_type								{ printf("GRAMMAR: let_be_statement: LET IDENTIFIER BE prim_data_type\n"); }
 	;
 
-assignment_stmt: IDENTIFIER LEFT_ARROW value				{ printf("GRAMMAR: assignment_stmt: IDENTIFIER LEFT_ARROW value\n"); }
+assignment_statement: IDENTIFIER LEFT_ARROW value				{ printf("GRAMMAR: assignment_statement: IDENTIFIER LEFT_ARROW value\n"); }
+	| IDENTIFIER DOT DATA LEFT_ARROW value					{ printf("GRAMMAR: assignment_statement: IDENTIFIER DOT DATA LEFT_ARROW value\n"); }
 	;
 
 pop_func: POP FROM IDENTIFIER								{ printf("GRAMMAR: pop_func: POP FROM IDENTIFIER\n"); }
 	;
 
-print_stmt: PRINT value										{ printf("GRAMMAR: print_stmt: PRINT value\n"); }
+print_statement: PRINT value										{ printf("GRAMMAR: print_statement: PRINT value\n"); }
 	;
 
-dump_stmt: DUMP value IN value										{ printf("GRAMMAR: dump_stmt: DUMP value IN value\n"); }
-	| DUMP value IN value AS GRAPHVIZ_DOT							{ printf("GRAMMAR: dump_stmt: DUMP value IN value AS GRAPHVIZ_DOT\n"); }
+dump_statement: DUMP value IN value										{ printf("GRAMMAR: dump_statement: DUMP value IN value\n"); }
+	| DUMP value IN value AS GRAPHVIZ_DOT							{ printf("GRAMMAR: dump_statement: DUMP value IN value AS GRAPHVIZ_DOT\n"); }
 	;
 
-data_type: prim_data_type										{  }
+data_type: primitive_data_type									{  }
 	| extra_data_type											{  }
+	| collection_type											{  }
 	;
 
-prim_data_type: EMPTY_TYPE										{  }
+primitive_data_type: EMPTY_TYPE									{  }
 	| CHAR_TYPE													{  }
 	| STRING_TYPE												{  }
 	| INTEGER_TYPE												{  }
@@ -241,42 +244,47 @@ prim_data_type: EMPTY_TYPE										{  }
 
 extra_data_type: node_type										{  }
 	| edge_type													{  }
-	| graph_type												{  }
-	| digraph_type												{  }
-	| set_type													{  }
-	| stack_type												{  }
-	| queue_type												{  }
 	;
 
 node_type: NODE																			{ printf("GRAMMAR: node_type: NODE\n"); }
-	| NODE OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA								{ printf("GRAMMAR: node_type: NODE OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA\n"); }
+	| NODE OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA								{ printf("GRAMMAR: node_type: NODE OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA\n"); }
 	;
 
 edge_type: EDGE																			{ printf("GRAMMAR: edge_type: EDGE\n"); }
-	| EDGE OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA								{ printf("GRAMMAR: edge_type: EDGE OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA\n"); }
+	| EDGE OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA								{ printf("GRAMMAR: edge_type: EDGE OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA\n"); }
 	;
 
-graph_type: GRAPH OPEN_ANTILAMBDA prim_data_type COMMA prim_data_type CLOSE_ANTILAMBDA	{  }
+collection_type: set_type
+	| stack_type
+	| queue_type
+	| graph_type
+	| digraph_type
+	;
+
+set_type: SET OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA							{  }
+	| SET OPEN_ANTILAMBDA extra_data_type CLOSE_ANTILAMBDA							{  }
+	;
+
+stack_type: STACK OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA						{  }
+	| STACK OPEN_ANTILAMBDA extra_data_type CLOSE_ANTILAMBDA						{  }
+	;
+
+queue_type: QUEUE OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA						{  }
+	| QUEUE OPEN_ANTILAMBDA extra_data_type CLOSE_ANTILAMBDA
+	;
+
+graph_type: GRAPH OPEN_ANTILAMBDA primitive_data_type COMMA primitive_data_type CLOSE_ANTILAMBDA	{  }
 	| GRAPH																				{ printf("GRAMMAR: graph_type: GRAPH\n"); }
 	;
 
-digraph_type: DIGRAPH OPEN_ANTILAMBDA prim_data_type COMMA prim_data_type CLOSE_ANTILAMBDA	{  }
+digraph_type: DIGRAPH OPEN_ANTILAMBDA primitive_data_type COMMA primitive_data_type CLOSE_ANTILAMBDA	{  }
 	| DIGRAPH																			{ printf("GRAMMAR: digraph_type: DIGRAPH\n"); }
 	;
 
-set_type: SET OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA							{  }
-	;
-
-stack_type: STACK OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA						{  }
-	;
-
-queue_type: QUEUE OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA						{  }
-	;
-
-data_type_instance: prim_data_type_instance												{ printf("GRAMMAR: data_type_instance: prim_data_type_instance\n"); }
+data_type_instance: primitive_data_type_instance												{ printf("GRAMMAR: data_type_instance: prim_data_type_instance\n"); }
 	| extra_data_type_instance															{ printf("GRAMMAR: data_type_instance: extra_data_type\n"); }
 
-prim_data_type_instance: STRING									{ printf("GRAMMAR: prim_data_type: STRING\n"); }
+primitive_data_type_instance: STRING									{ printf("GRAMMAR: prim_data_type: STRING\n"); }
 	| CHAR														{ printf("GRAMMAR: prim_data_type: CHAR\n"); }
 	| INTEGER													{ printf("GRAMMAR: prim_data_type: INTEGER\n"); }
 	| DECIMAL													{ printf("GRAMMAR: prim_data_type: DECIMAL\n"); }
