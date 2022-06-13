@@ -62,3 +62,7 @@ TokenID EndOfLinePatternAction(TokenID token) {
 	LogDebug("EndOfLinePatternAction.\n");
 	return token;
 }
+
+void CommentPatternAction(const char * lexeme) {
+	LogDebug("CommentPatternAction: '%s'.\n", lexeme);
+}

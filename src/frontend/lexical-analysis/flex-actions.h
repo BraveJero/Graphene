@@ -122,5 +122,5 @@ TokenID DecimalPatternAction(const char * lexeme);
 TokenID IdentifierPatternAction(const char * lexeme);
 TokenID IndentationPatternAction(TokenID token);
 TokenID EndOfLinePatternAction(TokenID token);
-
+void CommentPatternAction(const char * lexeme);
 #endif

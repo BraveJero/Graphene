@@ -40,7 +40,7 @@ whitespace			[ \f\n\r\t\v]
 
 %%
 #								{ BEGIN(COMMENT); }
-<COMMENT>.						{  }
+<COMMENT>.*						{ CommentPatternAction(yytext); }
 <COMMENT>\n						{ BEGIN(INITIAL); }
 
 ^{whitespace}*\n				{ /* Ignore blank lines */ }
