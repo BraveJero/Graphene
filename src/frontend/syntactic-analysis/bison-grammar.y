@@ -145,212 +145,210 @@
 
 %%
 
-program: function_definitions start_definition								{ printf("GRAMMAR: program: f_definitions start_definition\n"); $$ = ProgramGrammarAction(0); }
+program: function_definitions start_definition	{ $$ = newProgram($1, $2); }
 	;
 
-start_definition: START COLON EOL body									{ printf("GRAMMAR: start_definition: START COLON EOL body\n"); }
+start_definition: START COLON EOL body	{ $$ = newStartDefinition($4); }
 	;
 
-function_definitions: 													{  }
-	| function_definitions function_definition								{  }
+function_definitions: function_definitions function_definition	{ $$ = newFunctionDefinitionsFromList($1, $2); }
+	|															{ $$ = newFunctionDefinitionsFromEmpty(); }
 	;
 
-function_definition: DEF data_type IDENTIFIER argument_definition COLON EOL body			{ printf("GRAMMAR: functino_definition: DEF data_type IDENTIFIER argument_definition COLON BODY\n"); }
+function_definition: DEF data_type IDENTIFIER argument_definition COLON EOL body	{ $$ = newFunctionDefinition($2, $3, $4, $7); }
 	;
 
-argument_definition: OPEN_PARENTHESIS CLOSE_PARENTHESIS				{  }
-	| OPEN_PARENTHESIS argument_list CLOSE_PARENTHESIS			{  }
+argument_definition: OPEN_PARENTHESIS CLOSE_PARENTHESIS	{ $$ = newArgumentDefinitionFromEmpty(); }
+	| OPEN_PARENTHESIS argument_list CLOSE_PARENTHESIS	{ $$ = newArgumentDefinitionFromArgumentList($2); }
 	;
 
-argument_list: variable_definition											{  }
-	| argument_list COMMA variable_definition								{  }
+argument_list: variable_definition				{ $$ = newArgumentListFromVariableDefinition($1); }
+	| argument_list COMMA variable_definition	{ $$ = newArgumentListFromArgumentAndVariable($1, $3); }
 	;
 
-variable_definition: data_type IDENTIFIER									{  }
+variable_definition: data_type IDENTIFIER	{ $$ = newVariableDefinition($1, $2); }
 	;
 
-for_block: for_statement COLON EOL body
+for_block: for_statement COLON EOL body	{ $$ = newForBlock($1, $4); }
 	;
 
-for_statement: FOR IDENTIFIER FROM value TO value
-	| FOR IDENTIFIER FROM value TO value INCLUSIVE
-	| FOR IDENTIFIER FROM value TO value EXCLUSIVE
-	| FOR IDENTIFIER IN value
-	| FOR IDENTIFIER IN IDENTIFIER WITH it_type ENTRY value	
+for_statement: FOR IDENTIFIER range	{ $$ = newForStatement($2, $3); }
 	;
 
-it_type: BFS												{ printf("GRAMMAR: it_type: BFS\n"); }
-	| DFS														{ printf("GRAMMAR: it_type: DFS\n"); }
+range: FROM value TO value INCLUSIVE			{ $$ = newRangeInclusive($2, $4); }
+	| FROM value TO value EXCLUSIVE				{ $$ = newRangeExclusive($2, $4); }
+	| IN value									{ $$ = newRangeForEach($2); }
+	| IN IDENTIFIER WITH it_type ENTRY value	{ $$ = newRangeFromGraph($2, $4, $6); }
 	;
 
-while_block: WHILE condition COLON EOL body
+it_type: BFS	{ $$ = newItType($1); }
+	| DFS		{ $$ = newItType($1); }
 	;
 
-if_block: IF condition COLON EOL body
-	| IF condition COLON EOL body ELSE COLON EOL body
-	| IF condition COLON EOL body ELSE if_block
+while_block: WHILE condition COLON EOL body	{ $$ = newWhileBlock($2, $5); }
 	;
 
-condition: BOOLEAN											{ printf("GRAMMAR: condition: BOOLEAN\n"); }
-	| value comparator value 								{ printf("GRAMMAR: condition: value comparator value\n"); }
-	| condition AND condition								{ printf("GRAMMAR: condition: condition AND condition\n"); }
-	| condition OR condition								{ printf("GRAMMAR: condition: condition OR condition\n"); }
-	| NOT condition											{ printf("GRAMMAR: condition: NOT condition\n"); }
-	| IDENTIFIER IS EMPTY_TYPE								{ printf("GRAMMAR: condition: IDENTIFIER IS EMPTY_TYPE\n"); }
-	| IDENTIFIER IS NOT EMPTY_TYPE							{ printf("GRAMMAR: condition: IDENTIFIER IS NOT EMPTY_TYPE\n"); }
+if_block: IF condition COLON EOL body					{ $$ = newIfBlockFromIf($2, $5); }
+	| IF condition COLON EOL body ELSE COLON EOL body	{ $$ = newIfBlockFromIfElse($2, $5, $9); }
+	| IF condition COLON EOL body ELSE if_block			{ $$ = newIfBlockFromIsElseIf($2, $5, $7); }
 	;
 
-value: IDENTIFIER											{ printf("GRAMMAR: value: IDENTIFIER\n"); }
-	| function_call											{ printf("GRAMMAR: value: function_call\n"); }
-	| data_type_instance									{ printf("GRAMMAR: value: data_type_instance\n"); }
-	| value ADD value										{ printf("GRAMMAR: value: value ADD value\n"); }
-	| value SUB value										{ printf("GRAMMAR: value: value SUB value\n"); }
-	| value MUL value										{ printf("GRAMMAR: value: value MUL value\n"); }
-	| value DIV value										{ printf("GRAMMAR: value: value DIV value\n"); }
-	| pop_func												{ printf("GRAMMAR: value: pop_func\n"); }
-	| value DOT DATA										{ printf("GRAMMAR: value: value DOT DATA\n"); }
-	| value DOT EDGES
-	| value DOT NODES											
+condition: BOOLEAN					{ $$ = newConditionFromBoolean($1); }
+	| value comparator value		{ $$ = newConditionFromValueComparatorValue($1, $2, $3); }
+	| condition AND condition		{ $$ = newConditionFromConditionAndCondition($1, $3); }
+	| condition OR condition		{ $$ = newConditionFromConditionOrCondition($1, $3); }
+	| NOT condition					{ $$ = newConditionFromNotCondition($2); }
+	| IDENTIFIER IS EMPTY_TYPE		{ $$ = newConditionFromIdentifierIsEmpty($1); }
+	| IDENTIFIER IS NOT EMPTY_TYPE	{ $$ = newConditionFromIdentifierIsNotEmpty($1); }
 	;
 
-function_call: IDENTIFIER param_definition							{ printf("GRAMMAR: function_call IDENTIFIER param_definition\n"); }
+value: IDENTIFIER			{ $$ = newValueFromIdentifier($1); }
+	| function_call			{ $$ = newValueFromFunctionCall($1); }
+	| data_type_instance	{ $$ = newValueFromDataTypeInstance($1); }
+	| value ADD value		{ $$ = newValueFromValueAddValue($1, $3); }
+	| value SUB value		{ $$ = newValueFromValueSubValue($1, $3); }
+	| value MUL value		{ $$ = newValueFromValueMulValue($1, $3); }
+	| value DIV value		{ $$ = newValueFromValueDivValue($1, $3); }
+	| pop_function			{ $$ = newValueFromPopFunction($1); }
+	| value DOT DATA		{ $$ = newValueFromValueDotData($1); }
+	| value DOT EDGES		{ $$ = newValueFromValueDotEdges($1); }
+	| value DOT NODES		{ $$ = newValueFromValueDotNodes($1); }
 	;
 
-param_definition: OPEN_PARENTHESIS CLOSE_PARENTHESIS				{  }
-	| OPEN_PARENTHESIS param_list CLOSE_PARENTHESIS			{  }
+function_call: IDENTIFIER param_definition	{ $$ = functionCall($1, $2); }
 	;
 
-param_list: value											{  }
-	| param_list COMMA value								{  }
+param_definition: OPEN_PARENTHESIS CLOSE_PARENTHESIS	{ $$ = newParamDefinitionEmpty(); }
+	| OPEN_PARENTHESIS param_list CLOSE_PARENTHESIS		{ $$ = newParamDefinitionFromParamList($2); }
 	;
 
-comparator: GEQ
-	| LEQ
-	| GT
-	| LT
-	| EQ
+param_list: param_list COMMA value	{ $$ = newParamListFromParamListCommaValue($1, $3); }
+	| value							{ $$ = newParamListFromValue($1); }
 	;
 
-body: INDENT statements DEDENT														{ printf("GRAMMAR: body: INDENT statements DEDENT\n"); }
+comparator: GEQ	{ $$ = newComparatorFromGEQ($1); }
+	| LEQ		{ $$ = newComparatorFromLEQ($1); }
+	| GT		{ $$ = newComparatorFromGT($1); }
+	| LT		{ $$ = newComparatorFromLT($1); }
+	| EQ		{ $$ = newComparatorFromEQ($1); }
 	;
 
-statements: 																			{ printf("GRAMMAR: statements: ''\n"); }
-	| statements statement																{ printf("GRAMMAR: statements: statements statement\n"); }
+body: INDENT statements DEDENT	{ $$ = newBody($2); }
 	;
 
-statement: EOL																		{ printf("GRAMMAR: statement: EOL\n"); }
-	| for_block																	{ printf("GRAMMAR: statement: for_block\n"); }
-	| if_block																	{ printf("GRAMMAR: statement: if_block\n"); }
-	| while_block																	{ printf("GRAMMAR: statement: while_block\n"); }
-	| create_statement EOL															{  }
-	| insert_statement EOL															{  }
-	| return_statement EOL															{ printf("GRAMMAR: statement: rtn_statement\n"); }
-	| let_be_statement EOL															{ printf("GRAMMAR: statement: let_be_statement\n"); }
-	| assignment_statement EOL														{ printf("GRAMMAR: statement: assignemnt_statement\n"); }
-	| print_statement EOL															{ printf("GRAMMAR: statement: print_statement\n"); }
-	| dump_statement EOL															{ printf("GRAMMAR: statement: dump_statement\n"); }
+statements: statements statement	{ $$ = newStatementsFromStatementsStatement($1, $2); }
+	|								{ $$ = newStatements(); }
 	;
 
-create_statement: CREATE extra_data_type IDENTIFIER									{  }
-	| CREATE collection_type IDENTIFIER
+statement: EOL					{ $$ = newStatementEmpty(); }
+	| for_block					{ $$ = newStatementFromForBlock($1); }
+	| if_block					{ $$ = newStatementFromIfBlock($1); }
+	| while_block				{ $$ = newStatementFromWhileBlock($1); }
+	| create_statement EOL		{ $$ = newStatementFromCreateStatement($1); }
+	| insert_statement EOL		{ $$ = newStatementFromInsertStatement($1); }
+	| let_be_statement EOL		{ $$ = newStatementFromLetBeStatement($1); }
+	| return_statement EOL		{ $$ = newStatementFromReturnStatement($1); }
+	| assignment_statement EOL	{ $$ = newStatementFromAssignmentStatement($1); }
+	| print_statement EOL		{ $$ = newStatementFromPrintStatement($1); }
+	| dump_statement EOL		{ $$ = newStatementFromDumpStatement($1); }
 	;
 
-insert_statement: INSERT INTO IDENTIFIER data_type value							{ printf("GRAMMAR: insert_statement: INSERT INTO IDENTIFIER data_type value\n"); }
+create_statement: CREATE extra_data_type IDENTIFIER	{ $$ = newCreateStatementFromExtraDataType($2, $3); }
+	| CREATE collection_type IDENTIFIER				{ $$ = newCreateStatementFromCollectionDataType($2, $3); }
 	;
 
-return_statement: RETURN value													{ printf("GRAMMAR: return_statement: RETURN value\n"); }
-	| RETURN													{ printf("GRAMMAR: return_statement: RETURN\n"); }
+insert_statement: INSERT INTO IDENTIFIER data_type value	{ $$ = newInsertStatement($3, $4, $5); }
 	;
 
-let_be_statement: LET IDENTIFIER BE primitive_data_type								{ printf("GRAMMAR: let_be_statement: LET IDENTIFIER BE prim_data_type\n"); }
+return_statement: RETURN value	{ $$ = newReturnStatementWithValue($2); }
+	| RETURN					{ $$ = newReturnStatement(); }
 	;
 
-assignment_statement: IDENTIFIER LEFT_ARROW value				{ printf("GRAMMAR: assignment_statement: IDENTIFIER LEFT_ARROW value\n"); }
-	| IDENTIFIER DOT DATA LEFT_ARROW value					{ printf("GRAMMAR: assignment_statement: IDENTIFIER DOT DATA LEFT_ARROW value\n"); }
+let_be_statement: LET IDENTIFIER BE primitive_data_type	{ $$ = newLetBeStatement($2, $4); }
 	;
 
-pop_func: POP FROM IDENTIFIER								{ printf("GRAMMAR: pop_func: POP FROM IDENTIFIER\n"); }
+assignment_statement: IDENTIFIER LEFT_ARROW value	{ $$ = newAssignmentStatementFromIdentifier($1, $3); }
+	| IDENTIFIER DOT DATA LEFT_ARROW value			{ $$ = newAssignmentStatementFromIdentifierDotData($1, $5); }
 	;
 
-print_statement: PRINT value										{ printf("GRAMMAR: print_statement: PRINT value\n"); }
+pop_function: POP FROM IDENTIFIER	{ $$ = newPopFunction($3); }
 	;
 
-dump_statement: DUMP value IN value										{ printf("GRAMMAR: dump_statement: DUMP value IN value\n"); }
-	| DUMP value IN value AS GRAPHVIZ_DOT							{ printf("GRAMMAR: dump_statement: DUMP value IN value AS GRAPHVIZ_DOT\n"); }
+print_statement: PRINT value	{ $$ = newPrintStatement($2); }
 	;
 
-data_type: primitive_data_type									{  }
-	| extra_data_type											{  }
-	| collection_type											{  }
+dump_statement: DUMP value IN value			{ $$ = newDumpStatement($2, $4); }
+	| DUMP value IN value AS GRAPHVIZ_DOT	{ $$ = newDumpStatementAsDot($2, $4); }
 	;
 
-primitive_data_type: EMPTY_TYPE									{  }
-	| CHAR_TYPE													{  }
-	| STRING_TYPE												{  }
-	| INTEGER_TYPE												{  }
-	| DECIMAL_TYPE												{  }
-	| BOOLEAN_TYPE												{  }
+data_type: primitive_data_type	{ $$ = newDataTypeFromPrimitiveDataType($1); }
+	| extra_data_type			{ $$ = newDataTypeFromExtraDataType($1); }
+	| collection_type			{ $$ = newDataTypeFromCollectionType($1); }
 	;
 
-extra_data_type: node_type										{  }
-	| edge_type													{  }
+primitive_data_type: EMPTY_TYPE	{ $$ = newPrimitiveDataType($1); }
+	| CHAR_TYPE					{ $$ = newPrimitiveDataType($1); }
+	| STRING_TYPE				{ $$ = newPrimitiveDataType($1); }
+	| INTEGER_TYPE				{ $$ = newPrimitiveDataType($1); }
+	| DECIMAL_TYPE				{ $$ = newPrimitiveDataType($1); }
+	| BOOLEAN_TYPE				{ $$ = newPrimitiveDataType($1); }
 	;
 
-node_type: NODE																			{ printf("GRAMMAR: node_type: NODE\n"); }
-	| NODE OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA								{ printf("GRAMMAR: node_type: NODE OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA\n"); }
+extra_data_type: node_type	{ $$ = newExtraDataTypeFromNodeType($1); }
+	| edge_type				{ $$ = newExtraDataTypeFromEdgeType($1); }
 	;
 
-edge_type: EDGE																			{ printf("GRAMMAR: edge_type: EDGE\n"); }
-	| EDGE OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA								{ printf("GRAMMAR: edge_type: EDGE OPEN_ANTILAMBDA prim_data_type CLOSE_ANTILAMBDA\n"); }
+node_type: NODE OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA	{ $$ = newNodeType($3); }
 	;
 
-collection_type: set_type
-	| stack_type
-	| queue_type
-	| graph_type
-	| digraph_type
+edge_type: EDGE OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA	{ $$ = newEdgeType($3); }
 	;
 
-set_type: SET OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA							{  }
-	| SET OPEN_ANTILAMBDA extra_data_type CLOSE_ANTILAMBDA							{  }
+collection_type: set_type	{ $$ = newCollectionTypeFromSetType($1); }
+	| stack_type			{ $$ = newCollectionTypeFromStackType($1); }
+	| queue_type			{ $$ = newCollectionTypeFromQueueType($1); }
+	| graph_type			{ $$ = newCollectionTypeFromGraphType($1); }
+	| digraph_type			{ $$ = newCollectionTypeFromDigraphType($1); }
 	;
 
-stack_type: STACK OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA						{  }
-	| STACK OPEN_ANTILAMBDA extra_data_type CLOSE_ANTILAMBDA						{  }
+set_type: SET OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA	{ $$ = newSetTypeFromPrimitiveDataType($3); }
+	| SET OPEN_ANTILAMBDA extra_data_type CLOSE_ANTILAMBDA			{ $$ = newSetTypeFromExtraDataType($3); }
 	;
 
-queue_type: QUEUE OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA						{  }
-	| QUEUE OPEN_ANTILAMBDA extra_data_type CLOSE_ANTILAMBDA
+stack_type: STACK OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA	{ $$ = newStackTypeFromPrimitiveDataType($3); }
+	| STACK OPEN_ANTILAMBDA extra_data_type CLOSE_ANTILAMBDA			{ $$ = newStackTypeFromExtraDataType($3); }
 	;
 
-graph_type: GRAPH OPEN_ANTILAMBDA primitive_data_type COMMA primitive_data_type CLOSE_ANTILAMBDA	{  }
-	| GRAPH																				{ printf("GRAMMAR: graph_type: GRAPH\n"); }
+queue_type: QUEUE OPEN_ANTILAMBDA primitive_data_type CLOSE_ANTILAMBDA	{ $$ = newQueueTypeFromPrimitiveDataType($3); }
+	| QUEUE OPEN_ANTILAMBDA extra_data_type CLOSE_ANTILAMBDA			{ $$ = newQueueTypeFromExtraDataType($3); }
 	;
 
-digraph_type: DIGRAPH OPEN_ANTILAMBDA primitive_data_type COMMA primitive_data_type CLOSE_ANTILAMBDA	{  }
-	| DIGRAPH																			{ printf("GRAMMAR: digraph_type: DIGRAPH\n"); }
+graph_type: GRAPH OPEN_ANTILAMBDA primitive_data_type COMMA primitive_data_type CLOSE_ANTILAMBDA	{ $$ = newGraphType($3, $5); }
 	;
 
-data_type_instance: primitive_data_type_instance												{ printf("GRAMMAR: data_type_instance: prim_data_type_instance\n"); }
-	| extra_data_type_instance															{ printf("GRAMMAR: data_type_instance: extra_data_type\n"); }
-
-primitive_data_type_instance: STRING									{ printf("GRAMMAR: prim_data_type: STRING\n"); }
-	| CHAR														{ printf("GRAMMAR: prim_data_type: CHAR\n"); }
-	| INTEGER													{ printf("GRAMMAR: prim_data_type: INTEGER\n"); }
-	| DECIMAL													{ printf("GRAMMAR: prim_data_type: DECIMAL\n"); }
-	| BOOLEAN													{ printf("GRAMMAR: prim_data_type: BOOLEAN\n"); }
+digraph_type: DIGRAPH OPEN_ANTILAMBDA primitive_data_type COMMA primitive_data_type CLOSE_ANTILAMBDA	{ $$ = newDigraphType($3, $5); }
 	;
 
-extra_data_type_instance: node_instance
-	| edge_instance
+data_type_instance: primitive_data_type_instance	{ $$ = newDataTypeInstanceFromPrimitiveDataTypeInstance($1); }
+	| extra_data_type_instance						{ $$ = newDataTypeInstanceFromExtraDataTypeInstance($1); }
+
+primitive_data_type_instance: STRING	{ $$ = newPrimitiveDataTypeInstanceFromString($1); }
+	| CHAR								{ $$ = newPrimitiveDataTypeInstanceFromLetter($1); }
+	| INTEGER							{ $$ = newPrimitiveDataTypeInstanceFromInteger($1); }
+	| DECIMAL							{ $$ = newPrimitiveDataTypeInstanceFromDecimal($1); }
+	| BOOLEAN							{ $$ = newPrimitiveDataTypeInstanceFromBoolean($1); }
 	;
 
-node_instance: OPEN_PARENTHESIS value CLOSE_PARENTHESIS
-	| OPEN_PARENTHESIS value COMMA value CLOSE_PARENTHESIS
+extra_data_type_instance: node_instance	{ $$ = newExtraDataTypeInstanceFromNode($1); }
+	| edge_instance						{ $$ = newExtraDataTypeInstanceFromEdge($1); }
 	;
 
-edge_instance: OPEN_PARENTHESIS value RIGHT_ARROW value CLOSE_PARENTHESIS
-	| OPEN_PARENTHESIS value RIGHT_ARROW value COMMA value CLOSE_PARENTHESIS
+node_instance: OPEN_PARENTHESIS value CLOSE_PARENTHESIS		{ $$ = newNodeInstance($2); }
+	| OPEN_PARENTHESIS value COMMA value CLOSE_PARENTHESIS	{ $$ = newNodeInstanceWithValue($2, $4); }
+	;
+
+edge_instance: OPEN_PARENTHESIS value RIGHT_ARROW value CLOSE_PARENTHESIS		{ $$ = newEdgeInstance($2, $4); }
+	| OPEN_PARENTHESIS value RIGHT_ARROW value COMMA value CLOSE_PARENTHESIS	{ $$ = newEdgeInstanceWithValue($2, $4, $6); }
 	;
 
 %%
