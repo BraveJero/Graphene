@@ -7,12 +7,12 @@ START:
 
     LET ceil BE INTEGER
     ceil <- 17
-    FOR i FROM 1 TO ceil:
-        INSERT INTO g NODE ("Node " + i, i)
+    FOR i FROM 1 TO ceil INCLUSIVE:
+        INSERT INTO g NODE<INTEGER> ("Node " + i, i)
         LET parent BE INTEGER
         parent <- i/2
         IF parent >= 1:
-            INSERT INTO g EDGE ("Node " + parent -> "Node " + i)
+            INSERT INTO g EDGE<EMPTY> ("Node " + parent -> "Node " + i)
 
     FOR n IN g WITH BFS ENTRY ("Node 1"):
         PRINT n.DATA

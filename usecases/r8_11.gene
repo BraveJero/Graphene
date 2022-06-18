@@ -5,5 +5,5 @@
 START:
     CREATE GRAPH<EMPTY, EMPTY> g
     CREATE SET< EDGE<EMPTY> > newEdges
-    INSERT INTO g NODE newEdges
+    INSERT INTO g NODE<EMPTY> newEdges
     

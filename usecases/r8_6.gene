@@ -12,12 +12,12 @@ DEF SET<STRING> nodesWithKeyword(GRAPH<STRING, STRING> g, STRING label0, STRING 
 
 START:
     CREATE GRAPH<STRING, STRING> g
-    INSERT INTO g NODE ("A", "TLA")
-    INSERT INTO g NODE ("B", "TLA")
-    INSERT INTO g NODE ("C", "Protos")
+    INSERT INTO g NODE<STRING> ("A", "TLA")
+    INSERT INTO g NODE<STRING> ("B", "TLA")
+    INSERT INTO g NODE<STRING> ("C", "Protos")
 
-    INSERT INTO g EDGE ("A" -> "B")
-    INSERT INTO g EDGE ("A" -> "C")
+    INSERT INTO g EDGE<EMPTY> ("A" -> "B")
+    INSERT INTO g EDGE<EMPTY> ("A" -> "C")
 
     FOR n IN nodesWithKeyword(g, ("1"), "1"):
         PRINT n

@@ -8,7 +8,7 @@ START:
     LET ceil BE INTEGER
     ceil <- 17
 
-    FOR i FROM 1 TO ceil:
+    FOR i FROM 1 TO ceil INCLUSIVE:
         INSERT INTO g NODE<EMPTY> ("Node " + i)
         LET parent BE INTEGER
         parent <- i/2

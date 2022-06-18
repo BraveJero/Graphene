@@ -6,7 +6,7 @@ START:
     CREATE DIGRAPH<INTEGER, EMPTY> g
 
     INSERT INTO ceil INTEGER 17
-    FOR i FROM 1 TO ceil:
+    FOR i FROM 1 TO ceil EXCLUSIVE:
         INSERT INTO g NODE<INTEGER> ("Node " + i)
         INSERT INTO parent INTEGER i/2
         IF parent >= 1:
