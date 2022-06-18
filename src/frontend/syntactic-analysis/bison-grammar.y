@@ -1,87 +1,137 @@
 %{
 
+#include "../../backend/support/shared.h"
 #include "bison-actions.h"
 
 %}
 
+// Tipos de dato utilizados en las variables semanticas ($$, $1, $2, etc.):
+%union {
+	// No terminales.
+	struct Program* program;
+	struct StartDefinition* startDefinition;
+	struct FunctionDefinitions* functionDefinitions;
+	struct FunctionDefinition* functionDefinition;
+	struct ArgumentDefinition* argumentDefinition;
+	struct ArgumentList* argumentList;
+	struct VariableDefinition* variableDefinition;
+	struct ForBlock* forBlock;
+	struct ForStatement* forStatement;
+	struct Range* range;
+	struct ItType* itType;
+	struct WhileBlock* whileBlock;
+	struct IfBlock* ifBlock;
+	struct Condition* condition;
+	struct Value* value;
+	struct FunctionCall* functionCall;
+	struct ParamDefinition* paramDefinition;
+	struct ParamList* paramList;
+	struct Comparator* comparator;
+	struct Body* body;
+	struct Statements* statements;
+	struct Statement* statement;
+	struct CreateStatement* createStatement;
+	struct InsertStatement* insertStatement;
+	struct ReturnStatement* returnStatement;
+	struct LetBeStatement* letBeStatement;
+	struct AssignmentStatement* assignmentStatement;
+	struct PopFunction* popFunction;
+	struct PrintStatement* printStatement;
+	struct DumpStatement* dumpStatement;
+	struct DataType* dataType;
+	struct PrimitiveDataType* primitiveDataType;
+	struct ExtraDataType* extraDataType;
+	struct NodeType* nodeType;
+	struct EdgeType* edgeType;
+	struct CollectionType* collectionType;
+	struct SetType* setType;
+	struct StackType* stackType;
+	struct QueueType* queueType;
+	struct GraphType* graphType;
+	struct DigraphType* digraphType;
+	struct DataTypeInstance* dataTypeInstance;
+	struct PrimitiveDataTypeInstance* primitiveDataTypeInstance;
+	struct ExtraDataTypeInstance* extraDataTypeInstance;
+	struct NodeInstance* nodeInstance;
+	struct EdgeInstance* edgeInstance;
+
+	// Terminales
+	yytoken_kind_t token;
+	int integer;
+	double decimal;
+	char * string;
+	int bool;
+	char letter;
+}
+
 // IDs de los tokens generados desde Flex:
-%token	ADD
-%token	SUB
-%token	MUL
-%token	DIV
-
+// Operadores
+%token <token> ADD SUB MUL DIV
 // Paréntesis
-%token	OPEN_PARENTHESIS
-%token	CLOSE_PARENTHESIS
+%token <token> OPEN_PARENTHESIS CLOSE_PARENTHESIS
 
+%token <token> START CREATE INSERT INTO FOR WHILE
+%token <token> NODE EDGE GRAPH
+%token <token> FROM IF ELSE TO INCLUSIVE EXCLUSIVE WITH DFS BFS IS
+%token <token> NOT EMPTY_TYPE POP ENTRY PRINT DEF IN EQ LT GT GEQ LEQ AND OR RETURN
+%token <token> DUMP GRAPHVIZ_DOT LET BE
+%token <token> QUEUE STACK SET DIGRAPH
+%token <token> INTEGER_TYPE BOOLEAN_TYPE DECIMAL_TYPE CHAR_TYPE STRING_TYPE
+%token <token> OPEN_ANTILAMBDA CLOSE_ANTILAMBDA COMMA COLON DOT LEFT_ARROW RIGHT_ARROW EOL INDENT DEDENT DATA
+%token <token> EDGES NODES AS
 // Tipos de dato
-%token	INTEGER
-%token	START
-%token	CREATE
-%token	INSERT
-%token	INTO
-%token	FOR
-%token	WHILE
-%token	CHAR
-%token	DECIMAL
-%token	STRING
-%token	BOOLEAN
-%token	NODE
-%token	EDGE
-%token	GRAPH
-%token	FROM
-%token	IF
-%token	ELSE
-%token	TO
-%token	INCLUSIVE
-%token	EXCLUSIVE
-%token	WITH
-%token	DFS
-%token	BFS
-%token	IS
-%token	NOT
-%token	EMPTY_TYPE
-%token	POP
-%token	ENTRY
-%token	PRINT
-%token	DEF
-%token	IN
-%token	EQ
-%token	LT
-%token	GT
-%token	GEQ
-%token	LEQ
-%token	AND
-%token	OR
-%token	RETURN
-%token	DUMP
-%token	GRAPHVIZ_DOT
-%token	LET
-%token	BE
-%token	QUEUE
-%token	STACK
-%token	SET
-%token	DIGRAPH
-%token	INTEGER_TYPE
-%token	BOOLEAN_TYPE
-%token	DECIMAL_TYPE
-%token	CHAR_TYPE
-%token	STRING_TYPE
-%token	OPEN_ANTILAMBDA
-%token	CLOSE_ANTILAMBDA
-%token	COMMA
-%token	COLON
-%token	DOT
-%token	LEFT_ARROW
-%token	RIGHT_ARROW
-%token	IDENTIFIER
-%token	EOL
-%token	INDENT
-%token	DEDENT
-%token	DATA
-%token	EDGES
-%token	NODES
-%token	AS
+%token <integer> INTEGER
+%token <letter> CHAR
+%token <decimal> DECIMAL
+%token <string> STRING IDENTIFIER
+%token <bool> BOOLEAN
+
+%type <program> program
+%type <startDefinition> start_definition
+%type <functionDefinitions> function_definitions
+%type <functionDefinition> function_definition
+%type <argumentDefinition> argument_definition
+%type <argumentList> argument_list
+%type <variableDefinition> variable_definition
+%type <forBlock> for_block
+%type <forStatement> for_statement
+%type <range> range
+%type <itType> it_type
+%type <whileBlock> while_block
+%type <ifBlock> if_block
+%type <condition> condition
+%type <value> value
+%type <functionCall> function_call
+%type <paramDefinition> param_definition
+%type <paramList> param_list
+%type <comparator> comparator
+%type <body> body
+%type <statements> statements
+%type <statement> statement
+%type <createStatement> create_statement
+%type <insertStatement> insert_statement
+%type <returnStatement> return_statement
+%type <letBeStatement> let_be_statement
+%type <assignmentStatement> assignment_statement
+%type <popFunction> pop_function
+%type <printStatement> print_statement
+%type <dumpStatement> dump_statement
+%type <dataType> data_type
+%type <primitiveDataType> primitive_data_type
+%type <extraDataType> extra_data_type
+%type <nodeType> node_type
+%type <edgeType> edge_type
+%type <collectionType> collection_type
+%type <setType> set_type
+%type <stackType> stack_type
+%type <queueType> queue_type
+%type <graphType> graph_type
+%type <digraphType> digraph_type
+%type <dataTypeInstance> data_type_instance
+%type <primitiveDataTypeInstance> primitive_data_type_instance
+%type <extraDataTypeInstance> extra_data_type_instance
+%type <nodeInstance> node_instance
+%type <edgeInstance> edge_instance
 
 // Reglas de asociatividad y precedencia (de menor a mayor):
 %left ADD SUB

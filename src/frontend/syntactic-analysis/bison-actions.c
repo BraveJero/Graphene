@@ -1,8 +1,10 @@
-#include "../../backend/domain-specific/calculator.h"
-#include "../../backend/support/logger.h"
-#include "bison-actions.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
+#include "../../backend/support/shared.h"
+#include "../../backend/support/logger.h"
+#include "bison-actions.h"
 
 /**
  * Implementación de "bison-grammar.h".

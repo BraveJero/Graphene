@@ -2,101 +2,103 @@
 #define FLEX_ACTIONS_HEADER
 
 #include "../../backend/support/shared.h"
+#include "../syntactic-analysis/bison-parser.h"
 
 /**
  * Se definen los diferentes IDs de cada token disponible para el scanner Flex.
  */
-typedef enum TokenID {
+typedef yytoken_kind_t TokenID;
+// typedef enum TokenID {
 
-	// Por defecto, el valor "0" hace fallar el analizador sintáctico.
-	UNKNOWN = 0,
+// 	// Por defecto, el valor "0" hace fallar el analizador sintáctico.
+// 	UNKNOWN = 0,
 
-	// Código de error de Bison, que permite abortar el escaneo de lexemas cuando
-	// se presente un patrón desconocido. El número "257" coincide con el valor
-	// que Bison le otorga por defecto, pero además permite que el resto de
-	// tokens continúen desde el valor "258" lo que permite proteger los IDs
-	// internos que Bison reserva para crear "tokens literales":
-	YYUNDEF = 257,
+// 	// Código de error de Bison, que permite abortar el escaneo de lexemas cuando
+// 	// se presente un patrón desconocido. El número "257" coincide con el valor
+// 	// que Bison le otorga por defecto, pero además permite que el resto de
+// 	// tokens continúen desde el valor "258" lo que permite proteger los IDs
+// 	// internos que Bison reserva para crear "tokens literales":
+// 	YYUNDEF = 257,
 
-	// Operadores aritméticos.
-	ADD,
-	SUB,
-	MUL,
-	DIV,
+// 	// Operadores aritméticos.
+// 	ADD,
+// 	SUB,
+// 	MUL,
+// 	DIV,
 
-	// Paréntesis.
-	OPEN_PARENTHESIS,
-	CLOSE_PARENTHESIS,
+// 	// Paréntesis.
+// 	OPEN_PARENTHESIS,
+// 	CLOSE_PARENTHESIS,
 
-	// Tipos de dato.
-	INTEGER,
-	START,
-	CREATE,
-	INSERT,
-	INTO,
-	FOR,
-	WHILE,
-	CHAR,
-	DECIMAL,
-	STRING,
-	BOOLEAN,
-	NODE,
-	EDGE,
-	GRAPH,
-	FROM,
-	IF,
-	ELSE,
-	TO,
-	INCLUSIVE,
-	EXCLUSIVE,
-	WITH,
-	DFS,
-	BFS,
-	IS,
-	NOT,
-	EMPTY_TYPE,
-	POP,
-	ENTRY,
-	PRINT,
-	DEF,
-	IN,
-	EQ,
-	LT,
-	GT,
-	GEQ,
-	LEQ,
-	AND,
-	OR,
-	RETURN,
-	DUMP,
-	GRAPHVIZ_DOT,
-	LET,
-	BE,
-	QUEUE,
-	STACK,
-	SET,
-	DIGRAPH,
-	INTEGER_TYPE,
-	BOOLEAN_TYPE,
-	DECIMAL_TYPE,
-	CHAR_TYPE,
-	STRING_TYPE,
-	OPEN_ANTILAMBDA,
-	CLOSE_ANTILAMBDA,
-	COMMA,
-	COLON,
-	DOT,
-	LEFT_ARROW,
-	RIGHT_ARROW,
-	IDENTIFIER,
-	EOL,
-	INDENT,
-	DEDENT,
-	DATA,
-	EDGES,
-	NODES,
-	AS,
-} TokenID;
+// 	// Tipos de dato.
+// 	INTEGER,
+// 	START,
+// 	CREATE,
+// 	INSERT,
+// 	INTO,
+// 	FOR,
+// 	WHILE,
+// 	CHAR,
+// 	DECIMAL,
+// 	STRING,
+// 	BOOLEAN,
+// 	NODE,
+// 	EDGE,
+// 	GRAPH,
+// 	FROM,
+// 	IF,
+// 	ELSE,
+// 	TO,
+// 	INCLUSIVE,
+// 	EXCLUSIVE,
+// 	WITH,
+// 	DFS,
+// 	BFS,
+// 	IS,
+// 	NOT,
+// 	EMPTY_TYPE,
+// 	POP,
+// 	ENTRY,
+// 	PRINT,
+// 	DEF,
+// 	IN,
+// 	EQ,
+// 	LT,
+// 	GT,
+// 	GEQ,
+// 	LEQ,
+// 	AND,
+// 	OR,
+// 	RETURN,
+// 	DUMP,
+// 	GRAPHVIZ_DOT,
+// 	LET,
+// 	BE,
+// 	QUEUE,
+// 	STACK,
+// 	SET,
+// 	DIGRAPH,
+// 	INTEGER_TYPE,
+// 	BOOLEAN_TYPE,
+// 	DECIMAL_TYPE,
+// 	CHAR_TYPE,
+// 	STRING_TYPE,
+// 	OPEN_ANTILAMBDA,
+// 	CLOSE_ANTILAMBDA,
+// 	COMMA,
+// 	COLON,
+// 	DOT,
+// 	LEFT_ARROW,
+// 	RIGHT_ARROW,
+// 	IDENTIFIER,
+// 	EOL,
+// 	INDENT,
+// 	DEDENT,
+// 	DATA,
+// 	EDGES,
+// 	NODES,
+// 	AS,
+// } TokenID;
 
 /**
  * Se definen las acciones a ejecutar sobre cada patrón hallado mediante el
@@ -117,4 +119,5 @@ TokenID IdentifierPatternAction(const char * lexeme);
 TokenID IndentationPatternAction(TokenID token);
 TokenID EndOfLinePatternAction(TokenID token);
 void CommentPatternAction(const char * lexeme);
+
 #endif

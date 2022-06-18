@@ -54,7 +54,7 @@ if								{ return KeywordPatternAction(yytext, IF); }
 else                            { return KeywordPatternAction(yytext, ELSE); }
 to								{ return KeywordPatternAction(yytext, TO); }
 inclusive						{ return KeywordPatternAction(yytext, INCLUSIVE); }
-exclusive						{ return KeywordPatternAction(yytext, TO); }
+exclusive						{ return KeywordPatternAction(yytext, EXCLUSIVE); }
 with							{ return KeywordPatternAction(yytext, WITH); }
 dfs                             { return KeywordPatternAction(yytext, DFS); }
 bfs                             { return KeywordPatternAction(yytext, BFS); }
