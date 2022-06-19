@@ -23,6 +23,7 @@ void yyerror(const char * string) {
 
 Program* newProgram(struct FunctionDefinitions* functionDefinitions, struct StartDefinition* startDefinition) {
     Program* p = malloc(sizeof(Program));
+    LogInfo("Program created with address: 0x%x\n", p);
     p->functionDefinitions = functionDefinitions;
     p->startDefinition = startDefinition;
     state.succeed = true;
@@ -211,7 +212,7 @@ IfBlock* newIfBlockFromIsElseIf(Condition* condition, Body* body, IfBlock* ifBlo
 static Condition* newCondition(void) {
     Condition* c = malloc(sizeof(Condition));
     c->conditionType = 0;
-    c->boolean = 0;
+    c->bool = 0;
     c->leftV = NULL;
     c->rightV = NULL;
     c->comparator = NULL;
@@ -222,10 +223,10 @@ static Condition* newCondition(void) {
     return c;
 }
 
-Condition* newConditionFromBoolean(boolean boolean) {
+Condition* newConditionFromBoolean(boolean bool) {
     Condition* c = newCondition();
     c->conditionType = CONDITION_BOOLEAN;
-    c->boolean = boolean;
+    c->bool = bool;
     return c;
 }
 
@@ -868,7 +869,7 @@ PrimitiveDataTypeInstance* newPrimitiveDataTypeInstanceFromString(char * string)
     pdti->letter = '\0';
     pdti->integer = 0;
     pdti->decimal = 0;
-    pdti->boolean = false;
+    pdti->bool = false;
     return pdti;
 }
 
@@ -879,7 +880,7 @@ PrimitiveDataTypeInstance* newPrimitiveDataTypeInstanceFromLetter(char letter) {
     pdti->letter = letter;
     pdti->integer = 0;
     pdti->decimal = 0;
-    pdti->boolean = false;
+    pdti->bool = false;
     return pdti;
 }
 
@@ -890,7 +891,7 @@ PrimitiveDataTypeInstance* newPrimitiveDataTypeInstanceFromInteger(int integer) 
     pdti->letter = '\0';
     pdti->integer = integer;
     pdti->decimal = 0;
-    pdti->boolean = false;
+    pdti->bool = false;
     return pdti;
 }
 
@@ -901,18 +902,18 @@ PrimitiveDataTypeInstance* newPrimitiveDataTypeInstanceFromDecimal(double decima
     pdti->letter = '\0';
     pdti->integer = 0;
     pdti->decimal = decimal;
-    pdti->boolean = false;
+    pdti->bool = false;
     return pdti;
 }
 
-PrimitiveDataTypeInstance* newPrimitiveDataTypeInstanceFromBoolean(boolean boolean) {
+PrimitiveDataTypeInstance* newPrimitiveDataTypeInstanceFromBoolean(boolean bool) {
     PrimitiveDataTypeInstance* pdti = malloc(sizeof(PrimitiveDataTypeInstance));
     pdti->primitiveDataTypeInstanceType = PRIMITIVE_DATA_TYPE_INSTACE_BOOLEAN;
     pdti->string = NULL;
     pdti->letter = '\0';
     pdti->integer = 0;
     pdti->decimal = 0;
-    pdti->boolean = boolean;
+    pdti->bool = bool;
     return pdti;
 }
 

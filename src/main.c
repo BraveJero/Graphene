@@ -1,6 +1,7 @@
 #include "backend/code-generation/generator.h"
 #include "backend/support/logger.h"
 #include "backend/support/shared.h"
+#include "backend/semantic-analysis/semantic-analysis.h"
 #include "frontend/syntactic-analysis/bison-parser.h"
 #include <stdio.h>
 
@@ -24,8 +25,13 @@ const int main(const int argumentCount, const char ** arguments) {
 	switch (result) {
 		case 0:
 			if (state.succeed) {
+				int semanticalResult = SemanticalAnalysis(state);
+				if (semanticalResult != 0) {
+					LogInfo("Error semantico.");
+					break;
+				}
+				// TODO: Generator(state.result);
 				LogInfo("La compilacion fue exitosa.");
-				Generator(state.result);
 			}
 			else {
 				LogError("Se produjo un error en la aplicacion.");

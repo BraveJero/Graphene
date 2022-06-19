@@ -1,10 +1,6 @@
 #pragma once
 
-typedef enum {
-    INT_TYPE = 0,
-    FLOAT_TYPE,
-    STRING_TYPE,
-} DataType;
+#include "../domain-specific/ast.h"
 
 typedef struct contextStack contextStack;
 

@@ -154,7 +154,7 @@ struct PrimitiveDataTypeInstance* newPrimitiveDataTypeInstanceFromString(char * 
 struct PrimitiveDataTypeInstance* newPrimitiveDataTypeInstanceFromLetter(char letter);
 struct PrimitiveDataTypeInstance* newPrimitiveDataTypeInstanceFromInteger(int integer);
 struct PrimitiveDataTypeInstance* newPrimitiveDataTypeInstanceFromDecimal(double decimal);
-struct PrimitiveDataTypeInstance* newPrimitiveDataTypeInstanceFromBoolean(boolean boolean);
+struct PrimitiveDataTypeInstance* newPrimitiveDataTypeInstanceFromBoolean(boolean bool);
 
 struct ExtraDataTypeInstance* newExtraDataTypeInstanceFromNode(struct NodeInstance* node);
 struct ExtraDataTypeInstance* newExtraDataTypeInstanceFromEdge(struct EdgeInstance* edge);
