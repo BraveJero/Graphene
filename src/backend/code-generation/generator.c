@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <stdbool.h>
+#include <stdlib.h>
 
+#include "../../frontend/syntactic-analysis/bison-parser.h"
 #include "../support/logger.h"
 #include "generator.h"
 
@@ -8,295 +9,778 @@
  * Implementación de "generator.h".
  */
 
-static bool generateProgram(CompilerState* state, Program* program, FILE* out);
-static bool generateStartDefinition(CompilerState* state, StartDefinition* startDefinition, FILE* out);
-static bool generateFunctionDefinitions(CompilerState* state, FunctionDefinitions* functionDefinitions, FILE* out);
-static bool generateFunctionDefinition(CompilerState* state, FunctionDefinition* functionDefinition, FILE* out);
-static bool generateArgumentDefinition(CompilerState* state, ArgumentDefinition* argumentDefinition, FILE* out);
-static bool generateArgumentList(CompilerState* state, ArgumentList* argumentList, FILE* out);
-static bool generateVariableDefinition(CompilerState* state, VariableDefinition* variableDefinition, FILE* out);
-static bool generateForBlock(CompilerState* state, ForBlock* forBlock, FILE* out);
-static bool generateForStatement(CompilerState* state, ForStatement* forStatement, FILE* out);
-static bool generateRange(CompilerState* state, Range* range, FILE* out);
-static bool generateItType(CompilerState* state, ItType* itType, FILE* out);
-static bool generateWhileBlock(CompilerState* state, WhileBlock* whileBlock, FILE* out);
-static bool generateIfBlock(CompilerState* state, IfBlock* ifBlock, FILE* out);
-static bool generateCondition(CompilerState* state, Condition* condition, FILE* out);
-static bool generateValue(CompilerState* state, Value* value, FILE* out);
-static bool generateFunctionCall(CompilerState* state, FunctionCall* functionCall, FILE* out);
-static bool generateParamDefinition(CompilerState* state, ParamDefinition* paramDefinition, FILE* out);
-static bool generateParamList(CompilerState* state, ParamList* paramList, FILE* out);
-static bool generateComparator(CompilerState* state, Comparator* comparator, FILE* out);
-static bool generateBody(CompilerState* state, Body* body, FILE* out);
-static bool generateStatements(CompilerState* state, Statements* statements, FILE* out);
-static bool generateStatement(CompilerState* state, Statement* statement, FILE* out);
-static bool generateCreateStatement(CompilerState* state, CreateStatement* createStatement, FILE* out);
-static bool generateInsertStatement(CompilerState* state, InsertStatement* insertStatement, FILE* out);
-static bool generateReturnStatement(CompilerState* state, ReturnStatement* rs, FILE* out);
-static bool generateLetBeStatement(CompilerState* state, LetBeStatement* lbs, FILE* out);
-static bool generateAssignmentStatement(CompilerState* state, AssignmentStatement* as, FILE* out);
-static bool generatePopFunction(CompilerState* state, PopFunction* pf, FILE* out);
-static bool generatePrintStatement(CompilerState* state, PrintStatement* ps, FILE* out);
-static bool generateDumpStatement(CompilerState* state, DumpStatement* ds, FILE* out);
-static bool generateDataType(CompilerState* state, DataType* dt, FILE* out);
-static bool generatePrimitiveDataType(CompilerState* state, PrimitiveDataType* pdt, FILE* out);
-static bool generateExtraDataType(CompilerState* state, ExtraDataType* edt, FILE* out);
-static bool generateNodeType(CompilerState* state, NodeType* nt, FILE* out);
-static bool generateEdgeType(CompilerState* state, EdgeType* et, FILE* out);
-static bool generateCollectionType(CompilerState* state, CollectionType* ct, FILE* out);
-static bool generateSetType(CompilerState* state, SetType* st, FILE* out);
-static bool generateStackType(CompilerState* state, StackType* st, FILE* out);
-static bool generateQueueType(CompilerState* state, QueueType* qt, FILE* out);
-static bool generateGraphType(CompilerState* state, GraphType* gt, FILE* out);
-static bool generateDigraphType(CompilerState* state, DigraphType* dt, FILE* out);
-static bool generateDataTypeInstance(CompilerState* state, DataTypeInstance* dti, FILE* out);
-static bool generatePrimitiveDataTypeInstance(CompilerState* state, PrimitiveDataTypeInstance* pdti, FILE* out);
-static bool generateExtraDataTypeInstance(CompilerState* state, ExtraDataTypeInstance* edti, FILE* out);
-static bool generateNodeInstance(CompilerState* state, NodeInstance* ni, FILE* out);
-static bool generateEdgeInstance(CompilerState* state, EdgeInstance* ei, FILE* out);
+static void generateProgram(Program* p, CompilerState* state, FILE* out);
+static void generateStartDefinition(StartDefinition* sd, CompilerState* state, FILE* out);
+static void generateFunctionDefinitions(FunctionDefinitions* fd, CompilerState* state, FILE* out);
+static void generateFunctionDefinition(FunctionDefinition* fd, CompilerState* state, FILE* out);
+static void generateArgumentDefinition(ArgumentDefinition* ad, CompilerState* state, FILE* out);
+static void generateArgumentList(ArgumentList* al, CompilerState* state, FILE* out);
+static void generateVariableDefinition(VariableDefinition* vd, CompilerState* state, FILE* out);
+static void generateForBlock(ForBlock* fb, CompilerState* state, FILE* out);
+static void generateForStatement(ForStatement* fs, CompilerState* state, FILE* out);
+static void generateRange(Range* r, CompilerState* state, FILE* out);
+static void generateItType(ItType* it, CompilerState* state, FILE* out);
+static void generateWhileBlock(WhileBlock* wb, CompilerState* state, FILE* out);
+static void generateIfBlock(IfBlock* ib, CompilerState* state, FILE* out);
+static void generateCondition(Condition* c, CompilerState* state, FILE* out);
+static void generateValue(Value* v, CompilerState* state, FILE* out);
+static void generateFunctionCall(FunctionCall* fc, CompilerState* state, FILE* out);
+static void generateParamDefinition(ParamDefinition* pd, CompilerState* state, FILE* out);
+static void generateParamList(ParamList* pl, CompilerState* state, FILE* out);
+static void generateComparator(Comparator* c, CompilerState* state, FILE* out);
+static void generateBody(Body* b, CompilerState* state, FILE* out);
+static void generateStatements(Statements* s, CompilerState* state, FILE* out);
+static void generateStatement(Statement* s, CompilerState* state, FILE* out);
+static void generateCreateStatement(CreateStatement* cs, CompilerState* state, FILE* out);
+static void generateInsertStatement(InsertStatement* is, CompilerState* state, FILE* out);
+static void generateReturnStatement(ReturnStatement* rs, CompilerState* state, FILE* out);
+static void generateLetBeStatement(LetBeStatement* lbs, CompilerState* state, FILE* out);
+static void generateAssignmentStatement(AssignmentStatement* as, CompilerState* state, FILE* out);
+static void generatePopFunction(PopFunction* pf, CompilerState* state, FILE* out);
+static void generatePrintStatement(PrintStatement* ps, CompilerState* state, FILE* out);
+static void generateDumpStatement(DumpStatement* ds, CompilerState* state, FILE* out);
+static void generateDataType(DataType* dt, CompilerState* state, FILE* out);
+static void generatePrimitiveDataType(PrimitiveDataType* pdt, CompilerState* state, FILE* out);
+static void generateExtraDataType(ExtraDataType* edt, CompilerState* state, FILE* out);
+static void generateNodeType(NodeType* nt, CompilerState* state, FILE* out);
+static void generateEdgeType(EdgeType* et, CompilerState* state, FILE* out);
+static void generateCollectionType(CollectionType* ct, CompilerState* state, FILE* out);
+static void generateSetType(SetType* st, CompilerState* state, FILE* out);
+static void generateStackType(StackType* st, CompilerState* state, FILE* out);
+static void generateQueueType(QueueType* qt, CompilerState* state, FILE* out);
+static void generateGraphType(GraphType* gt, CompilerState* state, FILE* out);
+static void generateDigraphType(DigraphType* dt, CompilerState* state, FILE* out);
+static void generateDataTypeInstance(DataTypeInstance* dti, CompilerState* state, FILE* out);
+static void generatePrimitiveDataTypeInstance(PrimitiveDataTypeInstance* pdti, CompilerState* state, FILE* out);
+static void generateExtraDataTypeInstance(ExtraDataTypeInstance* edti, CompilerState* state, FILE* out);
+static void generateNodeInstance(NodeInstance* ni, CompilerState* state, FILE* out);
+static void generateEdgeInstance(EdgeInstance* ei, CompilerState* state, FILE* out);
 
-bool Generator(CompilerState* state, const char * outputFileName) {
+static void invalidType(const char * type, int token) {
+	LogError("Unknwon type for %s: %d\n", type, token);
+	abort();
+}
+
+boolean Generator(CompilerState* state, const char * outputFileName) {
 	FILE *out = fopen("temp", "w");
-	
-	bool success = generateProgram(state, state->program, out);
+	state->symbolTable = newContextStack();
+	generateProgram(state->program, state, out);
+	freeStack(state->symbolTable);
 	fclose(out);
 }
 
-static bool generateProgram(CompilerState* state, Program* program, FILE* out) {
-    pushContext(state->symbolTable); // global context
-									 // no variables should be defined but maybe functions
-	fprintf(out, "public class Program {\n");
+static void generateProgram(Program* p, CompilerState* state, FILE* out) {
+    LogDebug("Generating Program...");
+	fprintf(out, "class Program {\n");
 
-    generateFunctionDefinitions(state, program->functionDefinitions, out);
-    generateStartDefinition(state, program->startDefinition, out);
+	pushContext(state->symbolTable); // global context
+									 // no variables should be defined but maybe functions
+
+    generateFunctionDefinitions(p->functionDefinitions, state, out);
+    generateStartDefinition(p->startDefinition, state, out);
 
 	fprintf(out, "}\n");
     popContext(state->symbolTable);
 }
 
-static bool generateStartDefinition(CompilerState* state, StartDefinition* startDefinition, FILE* out) {
-    generateBody(state, startDefinition->body, out);
+static void generateFunctionDefinitions(FunctionDefinitions* fd, CompilerState* state, FILE* out) {
+	LogDebug("Generating FunctionDefinitions...");
+	switch(fd->functionDefinitionsType) {
+		case FUNCTION_DEFINITIONS_EMPTY:
+			break;
+		case FUNCTION_DEFINITIONS_LIST:
+			generateFunctionDefinitions(fd->functionDefinitions, state, out);
+			generateFunctionDefinition(fd->functionDefinition, state, out);
+			break;
+		default:
+			invalidType("FunctionDefinitions", fd->functionDefinitionsType);
+	}
 }
 
-static bool generateFunctionDefinitions(CompilerState* state, FunctionDefinitions* functionDefinitions, FILE* out) {
-    generateFunctionDefinitions(state, functionDefinitions->functionDefinitions, out);
-    generateFunctionDefinition(state, functionDefinitions->functionDefinition, out);
+static void generateFunctionDefinition(FunctionDefinition* fd, CompilerState* state, FILE* out) {
+	LogDebug("Generating FunctionDefinition...");
+	generateDataType(fd->dataType, state, out);
+	fprintf(out, " %s", fd->identifier);
+	generateArgumentDefinition(fd->argumentDefinition, state, out);
+	fprintf(out, " ");
+	generateBody(fd->body, state, out);
 }
 
-static bool generateFunctionDefinition(CompilerState* state, FunctionDefinition* functionDefinition, FILE* out) {
-    generateDataType(state, functionDefinition->dataType, out);
-    generateArgumentDefinition(state, functionDefinition->argumentDefinition, out);
-    generateBody(state, functionDefinition->body, out);
+static void generateDataType(DataType* dt, CompilerState* state, FILE* out) {
+	LogDebug("Generating DataType...");
+	switch(dt->dataTypeType) {
+		case DATA_TYPE_PRIMITIVE_DATA_TYPE:
+		    generatePrimitiveDataType(dt->primitiveDataType, state, out);
+			break;
+		case DATA_TYPE_EXTRA_DATA_TYPE:
+			generateExtraDataType(dt->extraDataType, state, out);
+			break;
+		case DATA_TYPE_COLLECTION_TYPE:
+			generateCollectionType(dt->collectionType, state, out);
+			break;
+		default:
+			invalidType("DataType", dt->dataTypeType);
+	}
 }
 
-static bool generateArgumentDefinition(CompilerState* state, ArgumentDefinition* argumentDefinition, FILE* out) {
-    generateArgumentList(state, argumentDefinition->argumentList, out);
+static void generatePrimitiveDataType(PrimitiveDataType* pdt, CompilerState* state, FILE* out) {
+	LogDebug("Generating PrimitiveDataType...");
+	switch(pdt->token) {
+		case EMPTY_TYPE:
+			fprintf(out, "Empty"); // TODO: Check
+			break;
+		case CHAR_TYPE:
+			fprintf(out, "char");
+			break;
+		case STRING_TYPE:
+			fprintf(out, "String");
+			break;
+		case INTEGER_TYPE:
+			fprintf(out, "Integer");
+			break;
+		case DECIMAL_TYPE:
+			fprintf(out, "Double");
+			break;
+		case BOOLEAN_TYPE:
+			fprintf(out, "Boolean");
+			break;
+		default:
+			invalidType("PrimitiveDataType", pdt->token);
+	}
 }
 
-static bool generateArgumentList(CompilerState* state, ArgumentList* argumentList, FILE* out) {
-    generateVariableDefinition(state, argumentList->variableDefinition, out);
-    generateArgumentList(state, argumentList->argumentList, out);
+static void generateExtraDataType(ExtraDataType* edt, CompilerState* state, FILE* out) {
+	LogDebug("Generating ExtraDataType...");
+	switch(edt->extraDataTypeType) {
+		case EXTRA_DATA_TYPE_NODE_TYPE:
+			generateNodeType(edt->nodeType, state, out);
+			break;
+		case EXTRA_DATA_TYPE_EDGE_TYPE:
+			generateEdgeType(edt->edgeType, state, out);
+			break;
+		default:
+			invalidType("ExtraDataType", edt->extraDataTypeType);
+	}
 }
 
-static bool generateVariableDefinition(CompilerState* state, VariableDefinition* variableDefinition, FILE* out) {
-    generateDataType(state, variableDefinition->dataType, out);
+static void generateNodeType(NodeType* nt, CompilerState* state, FILE* out) {
+	LogDebug("Generating NodeType...");
+	fprintf(out, "Node<");
+	generatePrimitiveDataType(nt->primitiveDataType, state, out);
+	fprintf(out, ">");
 }
 
-static bool generateForBlock(CompilerState* state, ForBlock* forBlock, FILE* out) {
-    generateForStatement(state, forBlock->forStatement, out);
-    generateBody(state, forBlock->body, out);
+static void generateEdgeType(EdgeType* et, CompilerState* state, FILE* out) {
+	LogDebug("Generating EdgeType...");
+	fprintf(out, "Edge<");
+	generatePrimitiveDataType(et->primitiveDataType, state, out);
+	fprintf(out, ">");
 }
 
-static bool generateForStatement(CompilerState* state, ForStatement* forStatement, FILE* out) {
-    generateRange(state, forStatement->range, out);
+static void generateCollectionType(CollectionType* ct, CompilerState* state, FILE* out) {
+	LogDebug("Generating CollectionType...");
+	switch(ct->collectionTypeType) {
+		case COLLECTION_TYPE_SET_TYPE:
+			generateSetType(ct->setType, state, out);
+			break;
+		case COLLECTION_TYPE_STACK_TYPE:
+			generateStackType(ct->stackType, state, out);
+			break;
+		case COLLECTION_TYPE_QUEUE_TYPE:
+			generateQueueType(ct->queueType, state, out);
+			break;
+		case COLLECTION_TYPE_GRAPH_TYPE:
+			generateGraphType(ct->graphType, state, out);
+			break;
+		case COLLECTION_TYPE_DIGRAPH_TYPE:
+			generateDigraphType(ct->digraphType, state, out);
+			break;
+		default:
+			invalidType("CollectionType", ct->collectionTypeType);
+	}
 }
 
-static bool generateRange(CompilerState* state, Range* range, FILE* out) {
-    generateValue(state, range->value, out);
-    generateItType(state, range->itType, out);
+static void generateSetType(SetType* st, CompilerState* state, FILE* out) {
+	LogDebug("Generating SetType...");
+	fprintf(out, "Set<");
+	switch(st->setTypeType) {
+		case SET_TYPE_PRIMITIVE_DATA_TYPE:
+			generatePrimitiveDataType(st->primitiveDataType, state, out);
+			break;
+		case SET_TYPE_EXTRA_DATA_TYPE:
+			generateExtraDataType(st->extraDataType, state, out);
+			break;
+		default:
+			invalidType("SetType", st->setTypeType);
+	}
+	fprintf(out, ">");
 }
 
-static bool generateItType(CompilerState* state, ItType* itType, FILE* out) {
+static void generateStackType(StackType* st, CompilerState* state, FILE* out) {
+	LogDebug("Generating StackType...");
+	fprintf(out, "Stack<");
+	switch(st->stackTypeType) {
+		case STACK_TYPE_PRIMITIVE_DATA_TYPE:
+			generatePrimitiveDataType(st->primitiveDataType, state, out);
+			break;
+		case STACK_TYPE_EXTRA_DATA_TYPE:
+			generateExtraDataType(st->extraDataType, state, out);
+			break;
+		default:
+			invalidType("StackType", st->stackTypeType);
+	}
+	fprintf(out, ">");
 }
 
-static bool generateWhileBlock(CompilerState* state, WhileBlock* whileBlock, FILE* out) {
-    generateCondition(state, whileBlock->condition, out);
-    generateBody(state, whileBlock->body, out);
+static void generateQueueType(QueueType* qt, CompilerState* state, FILE* out) {
+	LogDebug("Generating QueueType...");
+	fprintf(out, "Queue<");
+	switch(qt->queueTypeType) {
+		case QUEUE_TYPE_PRIMITIVE_DATA_TYPE:
+			generatePrimitiveDataType(qt->primitiveDataType, state, out);
+			break;
+		case QUEUE_TYPE_EXTRA_DATA_TYPE:
+			generateExtraDataType(qt->extraDataType, state, out);
+			break;
+		default:
+			invalidType("QueueType", qt->queueTypeType);
+	}
+	fprintf(out, ">");
 }
 
-static bool generateIfBlock(CompilerState* state, IfBlock* ifBlock, FILE* out) {
-    generateCondition(state, ifBlock->condition, out);
-    generateBody(state, ifBlock->body, out);
-    generateBody(state, ifBlock->body, out);
-    generateIfBlock(state, ifBlock->ifBlock, out);
+static void generateGraphType(GraphType* gt, CompilerState* state, FILE* out) {
+	LogDebug("Generating GraphType...");
+	fprintf(out, "Graph<");
+	generatePrimitiveDataType(gt->nodeType, state, out);
+	fprintf(out, ", ");
+	generatePrimitiveDataType(gt->edgeType, state, out);
+	fprintf(out, ">");
 }
 
-static bool generateCondition(CompilerState* state, Condition* condition, FILE* out) {
-    generateValue(state, condition->leftV, out);
-    generateValue(state, condition->rightV, out);
-    generateComparator(state, condition->comparator, out);
-    generateCondition(state, condition->leftC, out);
-    generateCondition(state, condition->rightC, out);
-    generateCondition(state, condition->condition, out);
+static void generateDigraphType(DigraphType* gt, CompilerState* state, FILE* out) {
+	LogDebug("Generating Digraph...");
+	fprintf(out, "Digraph<");
+	generatePrimitiveDataType(gt->nodeType, state, out);
+	fprintf(out, ", ");
+	generatePrimitiveDataType(gt->edgeType, state, out);
+	fprintf(out, ">");
 }
 
-static bool generateValue(CompilerState* state, Value* value, FILE* out) {
-    generateFunctionCall(state, value->functionCall, out);
-    generateDataTypeInstance(state, value->dataTypeInstance, out);
-    generateValue(state, value->left, out);
-    generateValue(state, value->right, out);
-    generatePopFunction(state, value->popFunction, out);
-    generateValue(state, value->value, out);
+static void generateArgumentDefinition(ArgumentDefinition* ad, CompilerState* state, FILE* out) {
+	LogDebug("Generating ArgumentDefinition...");
+	fprintf(out, "(");
+	switch(ad->argumentDefinitionType) {
+		case ARGUMENT_DEFINITION_EMPTY:
+			fprintf(out, "void");
+			break;
+		case ARGUMENT_DEFINITION_LIST:
+			generateArgumentList(ad->argumentList, state, out);
+			break;
+		default:
+			invalidType("ArgumentDefinition", ad->argumentDefinitionType);
+	}
+	fprintf(out, ")");
 }
 
-static bool generateFunctionCall(CompilerState* state, FunctionCall* functionCall, FILE* out) {
-    generateParamDefinition(state, functionCall->paramDefinition, out);
+static void generateArgumentList(ArgumentList* al, CompilerState* state, FILE* out) {
+	LogDebug("Generating ArgumentDefinition...");
+	switch(al->argumentListType) {
+		case ARGUMENT_LIST_VARIABLE_DEFINITION:
+			generateVariableDefinition(al->variableDefinition, state, out);
+			break;
+		case ARGUMENT_LIST_LIST_COMMA_VARIABLE:
+			generateArgumentList(al->argumentList, state, out);
+			fprintf(out, ", ");
+			generateVariableDefinition(al->variableDefinition, state, out);
+			break;
+		default:
+			invalidType("ArgumentList", al->argumentListType);
+	}
 }
 
-static bool generateParamDefinition(CompilerState* state, ParamDefinition* paramDefinition, FILE* out) {
-    generateParamList(state, paramDefinition->paramList, out);
+static void generateVariableDefinition(VariableDefinition* vd, CompilerState* state, FILE* out) {
+	LogDebug("Generating VariableDefinition...");
+	generateDataType(vd->dataType, state, out);
+	fprintf(out, " %s", vd->identifier);
 }
 
-static bool generateParamList(CompilerState* state, ParamList* paramList, FILE* out) {
-    generateParamList(state, paramList->paramList, out);
-    generateValue(state, paramList->value, out);
+static void generateBody(Body* b, CompilerState* state, FILE* out) {
+	LogDebug("Generating Body...");
+	fprintf(out, "{\n");
+	pushContext(state->symbolTable);
+
+    generateStatements(b->statements, state, out);
+
+	popContext(state->symbolTable);
+	fprintf(out, "}\n");
 }
 
-static bool generateComparator(CompilerState* state, Comparator* comparator, FILE* out) {
+static void generateStatements(Statements* s, CompilerState* state, FILE* out) {
+	LogDebug("Generating Statements...");
+	switch(s->statementsType) {
+		case STATEMENTS_STATEMENTS_STATEMENT:
+			generateStatements(s->statements, state, out);
+			generateStatement(s->statement, state, out);
+			break;
+		case STATEMENTS_EMPTY:
+			break;
+		default:
+			invalidType("Statements", s->statementsType);
+	}
 }
 
-static bool generateBody(CompilerState* state, Body* body, FILE* out) {
-    generateStatements(state, body->statements, out);
+static void generateStatement(Statement* s, CompilerState* state, FILE* out) {
+	LogDebug("Generating Statement...");
+	switch(s->statementType) {
+		case STATEMENT_EMPTY:
+			break;
+		case STATEMENT_FOR_BLOCK:
+			generateForBlock(s->forBlock, state, out);
+			break;
+		case STATEMENT_IF_BLOCK:
+			generateIfBlock(s->ifBlock, state, out);
+			break;
+		case STATEMENT_WHILE_BLOCK:
+			generateWhileBlock(s->whileBlock, state, out);
+			break;
+		case STATEMENT_CREATE_STATEMENT:
+			generateCreateStatement(s->createStatement, state, out);
+			break;
+		case STATEMENT_INSERT_STATEMENT:
+			generateInsertStatement(s->insertStatement, state, out);
+			break;
+		case STATEMENT_LET_BE_STATEMENT:
+			generateLetBeStatement(s->letBeStatement, state, out);
+			break;
+		case STATEMENT_RETURN_STATEMENT:
+			generateReturnStatement(s->returnStatement, state, out);
+			break;
+		case STATEMENT_ASSIGNMENT_STATEMENT:
+			generateAssignmentStatement(s->assignmentStatement, state, out);
+			break;
+		case STATEMENT_PRINT_STATEMENT:
+			generatePrintStatement(s->printStatement, state, out);
+			break;
+		case STATEMENT_DUMP_STATAMENT:
+			generateDumpStatement(s->dumpStatement, state, out);
+			break;
+		default:
+			invalidType("Statement", s->statementType);
+	}
 }
 
-static bool generateStatements(CompilerState* state, Statements* statements, FILE* out) {
-    generateStatements(state, statements->statements, out);
-    generateStatement(state, statements->statement, out);
+static void generateForBlock(ForBlock* fb, CompilerState* state, FILE* out) {
+	LogDebug("Generating ForBlock...");
+	generateForStatement(fb->forStatement, state, out);
+	generateBody(fb->body, state, out);
 }
 
-static bool generateStatement(CompilerState* state, Statement* statement, FILE* out) {
-    generateForBlock(state, statement->forBlock, out);
-    generateIfBlock(state, statement->ifBlock, out);
-    generateWhileBlock(state, statement->whileBlock, out);
-    generateCreateStatement(state, statement->createStatement, out);
-    generateInsertStatement(state, statement->insertStatement, out);
-    generateReturnStatement(state, statement->returnStatement, out);
-    generateLetBeStatement(state, statement->letBeStatement, out);
-    generateAssignmentStatement(state, statement->assignmentStatement, out);
-    generatePrintStatement(state, statement->printStatement, out);
-    generateDumpStatement(state, statement->dumpStatement, out);
+static void generateForStatement(ForStatement* fs, CompilerState* state, FILE* out) {
+	LogDebug("Generating ForBlock...");
+	// TODO: Check how to do, depends on iterators
+	fprintf(out, "(TODO) FOR %s", fs->identifier);
+    generateRange(fs->range, state, out);
 }
 
-static bool generateCreateStatement(CompilerState* state, CreateStatement* createStatement, FILE* out) {
-    generateExtraDataType(state, createStatement->extraDataType, out);
-    generateCollectionType(state, createStatement->collectionType, out);
+static void generateRange(Range* r, CompilerState* state, FILE* out) {
+	LogDebug("Generating Range...");
+	// TODO: Depends on ForStatement
+    generateValue(r->value, state, out);
+    generateItType(r->itType, state, out);
 }
 
-static bool generateInsertStatement(CompilerState* state, InsertStatement* insertStatement, FILE* out) {
-    generateDataType(state, insertStatement->dataType, out);
-    generateValue(state, insertStatement->value, out);
+static void generateValue(Value* v, CompilerState* state, FILE* out) {
+	LogDebug("Generating Value...");
+	switch(v->valueType) {
+		case VALUE_IDENTIFIER:
+			fprintf(out, "%s", v->identifier);
+			break;
+		case VALUE_FUNCTION_CALL:
+			generateFunctionCall(v->functionCall, state, out);
+			break;
+		case VALUE_DATA_TYPE_INSTANCE:
+			generateDataTypeInstance(v->dataTypeInstance, state, out);
+			break;
+		case VALUE_VALUE_ADD_VALUE:
+			fprintf(out, "(");
+			generateValue(v->left, state, out);
+			fprintf(out, "+");
+			generateValue(v->right, state, out);
+			fprintf(out, ")");
+			break;
+		case VALUE_VALUE_SUB_VALUE:
+			fprintf(out, "(");
+			generateValue(v->left, state, out);
+			fprintf(out, "-");
+			generateValue(v->right, state, out);
+			fprintf(out, ")");
+			break;
+		case VALUE_VALUE_MUL_VALUE:
+			fprintf(out, "(");
+			generateValue(v->left, state, out);
+			fprintf(out, "*");
+			generateValue(v->right, state, out);
+			fprintf(out, ")");
+			break;
+		case VALUE_VALUE_DIV_VALUE:
+			fprintf(out, "(");
+			generateValue(v->left, state, out);
+			fprintf(out, "/");
+			generateValue(v->right, state, out);
+			fprintf(out, ")");
+			break;
+		case VALUE_POP_FUNCTION:
+			generatePopFunction(v->popFunction, state, out);
+			break;
+		case VALUE_VALUE_DOT_DATA:
+			generateValue(v->value, state, out);
+			fprintf(out, ".getData()");
+			break;
+		case VALUE_VALUE_DOT_EDGES:
+			generateValue(v->value, state, out);
+			fprintf(out, ".getEdges()");
+			break;
+		case VALUE_VALUE_DOT_NODES:
+			generateValue(v->value, state, out);
+			fprintf(out, ".getNodes()");
+			break;
+		default:
+			invalidType("Value", v->valueType);
+	}
+	// TODO: Add semantic validation
 }
 
-static bool generateReturnStatement(CompilerState* state, ReturnStatement* rs, FILE* out) {
-    generateValue(state, rs->returnValue, out);
+static void generateFunctionCall(FunctionCall* fc, CompilerState* state, FILE* out) {
+	LogDebug("Generating FunctionCall...");
+	fprintf(out, "%s", fc->identifier);
+	generateParamDefinition(fc->paramDefinition, state, out);
 }
 
-static bool generateLetBeStatement(CompilerState* state, LetBeStatement* lbs, FILE* out) {
-    generatePrimitiveDataType(state, lbs->primitiveDataType, out);
+static void generateParamDefinition(ParamDefinition* pd, CompilerState* state, FILE* out) {
+	LogDebug("Generating ParamDefinition...");
+	fprintf(out, "(");
+	switch (pd->paramDefinitionType) {
+		case PARAM_DEFINITION_EMPTY:
+			break;
+		case PARAM_DEFINITION_PARAM_LIST:
+			generateParamList(pd->paramList, state, out);
+			break;
+		default:
+			invalidType("ParamDefinition", pd->paramDefinitionType);
+	}
+	fprintf(out, ")");
 }
 
-static bool generateAssignmentStatement(CompilerState* state, AssignmentStatement* as, FILE* out) {
-    generateValue(state, as->value, out);
+static void generateParamList(ParamList* pl, CompilerState* state, FILE* out) {
+	LogDebug("Generating ParamList...");
+	switch(pl->paramListType) {
+		case PARAM_LIST_PARAM_LIST_COMMA_VALUE:
+			generateParamList(pl->paramList, state, out);
+			fprintf(out, ", ");
+			generateValue(pl->value, state, out);
+			break;
+		case PARAM_LIST_VALUE:
+			generateValue(pl->value, state, out);
+			break;
+		default:
+			invalidType("ParamList", pl->paramListType);
+	}
 }
 
-static bool generatePopFunction(CompilerState* state, PopFunction* pf, FILE* out) {
+static void generateDataTypeInstance(DataTypeInstance* dti, CompilerState* state, FILE* out) {
+	LogDebug("Generating DataTypeInstance...");
+	switch (dti->dataTypeInstanceType) {
+		case DATA_TYPE_INSTANCE_PRIMITIVE_DATA_TYPE_INSTANCE:
+			generatePrimitiveDataTypeInstance(dti->primitiveDataTypeInstance, state, out);
+			break;
+		case DATA_TYPE_INSTANCE_EXTRA_DATA_TYPE_INSTANCE:
+			generateExtraDataTypeInstance(dti->extraDataTypeInstance, state, out);
+			break;
+		default:
+			invalidType("DataTypeInstance", dti->dataTypeInstanceType);
+	}
 }
 
-static bool generatePrintStatement(CompilerState* state, PrintStatement* ps, FILE* out) {
-    generateValue(state, ps->graph, out);
+static void generatePrimitiveDataTypeInstance(PrimitiveDataTypeInstance* pdti, CompilerState* state, FILE* out) {
+	LogDebug("Generating PrimitiveDataTypeInstance...");
+	switch(pdti->primitiveDataTypeInstanceType) {
+		case PRIMITIVE_DATA_TYPE_INSTACE_STRING:
+			fprintf(out, "\"%s\"", pdti->string);
+			break;
+		case PRIMITIVE_DATA_TYPE_INSTACE_CHAR:
+			fprintf(out, "'%c'", pdti->letter);
+			break;
+		case PRIMITIVE_DATA_TYPE_INSTACE_INTEGER:
+			fprintf(out, "%d", pdti->integer);
+			break;
+		case PRIMITIVE_DATA_TYPE_INSTACE_DECIMAL:
+			fprintf(out, "%g", pdti->decimal);
+			break;
+		case PRIMITIVE_DATA_TYPE_INSTACE_BOOLEAN:
+			fprintf(out, "%s", (pdti->bool) ? "true" : "false");
+			break;
+		default:
+			invalidType("PrimitiveDataTypeInstance", pdti->primitiveDataTypeInstanceType);
+	}
 }
 
-static bool generateDumpStatement(CompilerState* state, DumpStatement* ds, FILE* out) {
-    generateValue(state, ds->graph, out);
-    generateValue(state, ds->file, out);
+static void generateExtraDataTypeInstance(ExtraDataTypeInstance* edti, CompilerState* state, FILE* out) {
+	LogDebug("Generating ExtraDataTypeInstance...");
+	switch(edti->extraDataTypeInstanceType) {
+		case EXTRA_DATA_TYPE_INSTANCE_NODE_INSTANCE:
+			generateNodeInstance(edti->nodeInstance, state, out);
+			break;
+		case EXTRA_DATA_TYPE_INSTANCE_EDGE_INSTANCE:
+			generateEdgeInstance(edti->edgeInstance, state, out);
+			break;
+		default:
+			invalidType("ExtraDataTypeInstance", edti->extraDataTypeInstanceType);
+	}
 }
 
-static bool generateDataType(CompilerState* state, DataType* dt, FILE* out) {
-    generatePrimitiveDataType(state, dt->primitiveDataType, out);
-    generateExtraDataType(state, dt->extraDataType, out);
-    generateCollectionType(state, dt->collectionType, out);
+static void generateNodeInstance(NodeInstance* ni, CompilerState* state, FILE* out) {
+	LogDebug("Generating NodeInstance...");
+	switch (ni->nodeInstaceType) {
+		case NODE_INSTANCE:
+			fprintf(out, "new Node<Empty>(");
+			generateValue(ni->label, state, out); // TODO: Check if it's string
+			fprintf(out, ")");
+			break;
+		case NODE_INSTANCE_WITH_VALUE:
+			fprintf(out, "new Node<>(");
+			generateValue(ni->label, state, out); // TODO: Check if it's string
+			fprintf(out, ",");
+			generateValue(ni->value, state, out);
+			fprintf(out, ")");
+			break;
+		default:
+			invalidType("NodeInstance", ni->nodeInstaceType);
+	}
 }
 
-static bool generatePrimitiveDataType(CompilerState* state, PrimitiveDataType* pdt, FILE* out) {
+static void generateEdgeInstance(EdgeInstance* ei, CompilerState* state, FILE* out) {
+	LogDebug("Generating EdgeInstance...");
+	switch (ei->edgeInstanceType) {
+		case EDGE_INSTANCE:
+			fprintf(out, "new Edge<Empty>(");
+			generateValue(ei->left, state, out); // TODO: Check if it's string
+			fprintf(out, ",");
+			generateValue(ei->right, state, out); // TODO: Check if it's string
+			fprintf(out, ")");
+			break;
+		case EDGE_INSTANCE_WITH_VALUE:
+			fprintf(out, "new Edge<>(");
+			generateValue(ei->left, state, out); // TODO: Check if it's string
+			fprintf(out, ",");
+			generateValue(ei->right, state, out); // TODO: Check if it's string
+			fprintf(out, ",");
+			generateValue(ei->value, state, out);
+			fprintf(out, ")");
+			break;
+		default:
+			invalidType("EdgeInstance", ei->edgeInstanceType);
+	}
 }
 
-static bool generateExtraDataType(CompilerState* state, ExtraDataType* edt, FILE* out) {
-    generateNodeType(state, edt->nodeType, out);
-    generateEdgeType(state, edt->edgeType, out);
+static void generatePopFunction(PopFunction* pf, CompilerState* state, FILE* out) {
+	LogDebug("Generating PopFunction...");
+	fprintf(out, "%s.pop()", pf->identifier);
+	// TODO: Check identifier is of type stack or queue
 }
 
-static bool generateNodeType(CompilerState* state, NodeType* nt, FILE* out) {
-    generatePrimitiveDataType(state, nt->primitiveDataType, out);
+static void generateItType(ItType* it, CompilerState* state, FILE* out) {
+	// TODO: Depends on for statements
 }
 
-static bool generateEdgeType(CompilerState* state, EdgeType* et, FILE* out) {
-    generatePrimitiveDataType(state, et->primitiveDataType, out);
+static void generateIfBlock(IfBlock* ib, CompilerState* state, FILE* out) {
+	LogDebug("Generating IfBlock...");
+	switch(ib->ifBlockType) {
+		case IF_BLOCK_IF_CONDITION:
+			fprintf(out, "if ");
+			generateCondition(ib->condition, state, out);
+			fprintf(out, " ");
+			generateBody(ib->body, state, out);
+			break;
+		case IF_BLOCK_IF_ELSE:
+			fprintf(out, "if ");
+			generateCondition(ib->condition, state, out);
+			fprintf(out, " ");
+			generateBody(ib->body, state, out);
+			fprintf(out, "else ");
+			generateBody(ib->elseBody, state, out);
+			break;
+		case IF_BLOCK_IF_ELSE_IF:
+			fprintf(out, "if ");
+			generateCondition(ib->condition, state, out);
+			fprintf(out, " ");
+			generateBody(ib->body, state, out);
+			fprintf(out, "else ");
+			generateIfBlock(ib->ifBlock, state, out);
+			break;
+		default:
+			invalidType("IfBlock", ib->ifBlockType);
+	}
 }
 
-static bool generateCollectionType(CompilerState* state, CollectionType* ct, FILE* out) {
-    generateSetType(state, ct->setType, out);
-    generateStackType(state, ct->stackType, out);
-    generateQueueType(state, ct->queueType, out);
-    generateGraphType(state, ct->graphType, out);
-    generateDigraphType(state, ct->digraphType, out);
+static void generateCondition(Condition* c, CompilerState* state, FILE* out) {
+	LogDebug("Generating Condition...");
+	fprintf(out, "(");
+	switch(c->conditionType) {
+		case CONDITION_BOOLEAN:
+			fprintf(out, "%s", (c->bool) ? "true" : "false");
+			break;
+		case CONDITION_VALUE_COMPARATOR_VALUE:
+			// TODO: compare types
+			generateValue(c->leftV, state, out);
+			generateComparator(c->comparator, state, out);
+			generateValue(c->rightV, state, out);
+			break;
+		case CONDITION_CONDITION_AND_CONDITION:
+			generateCondition(c->leftC, state, out);
+			fprintf(out, " && ");
+			generateCondition(c->rightC, state, out);
+			break;
+		case CONDITION_CONDITION_OR_CONDITION:
+			generateCondition(c->leftC, state, out);
+			fprintf(out, " || ");
+			generateCondition(c->rightC, state, out);
+			break;
+		case CONDITION_NOT_CONDITION:
+			fprintf(out, "!");
+			generateCondition(c->condition, state, out);
+			break;
+		case CONDITION_IDENTIFIER_EMPTY: // TODO: Check if collection type
+			fprintf(out, "%s.empty()", c->identifier);
+			break;
+		case CONDITION_IDENTIFIER_NOT_EMPTY: // TODO: Check if collection type
+			fprintf(out, "! %s.empty()", c->identifier);
+			break;
+		default:
+			invalidType("Condition", c->conditionType);
+	}
+	fprintf(out, ")");
 }
 
-static bool generateSetType(CompilerState* state, SetType* st, FILE* out) {
-    generatePrimitiveDataType(state, st->primitiveDataType, out);
-    generateExtraDataType(state, st->extraDataType, out);
+static void generateComparator(Comparator* c, CompilerState* state, FILE* out) {
+	LogDebug("Generating Comparator...");
+	switch(c->comparatorType) {
+		case COMPARATOR_GEQ:
+			fprintf(out, "<=");
+			break;
+		case COMPARATOR_LEQ:
+			fprintf(out, ">=");
+			break;
+		case COMPARATOR_GT:
+			fprintf(out, ">");
+			break;
+		case COMPARATOR_LT:
+			fprintf(out, "<");
+			break;
+		case COMPARATOR_EQ:
+			fprintf(out, "==");
+			break;
+		default:
+			invalidType("Comparator", c->comparatorType);
+	}
 }
 
-static bool generateStackType(CompilerState* state, StackType* st, FILE* out) {
-    generatePrimitiveDataType(state, st->primitiveDataType, out);
-    generateExtraDataType(state, st->extraDataType, out);
+static void generateWhileBlock(WhileBlock* wb, CompilerState* state, FILE* out) {
+	LogDebug("Generating WhileBlock...");
+	fprintf(out, "while");
+	generateCondition(wb->condition, state, out);
+	generateBody(wb->body, state, out);
 }
 
-static bool generateQueueType(CompilerState* state, QueueType* qt, FILE* out) {
-    generatePrimitiveDataType(state, qt->primitiveDataType, out);
-    generateExtraDataType(state, qt->extraDataType, out);
+static void generateCreateStatement(CreateStatement* cs, CompilerState* state, FILE* out) {
+	LogDebug("Generating CreateStatement...");
+	switch(cs->createStatementType) {
+		case CREATE_STATEMENT_EXTRA_DATA_TYPE:
+			generateExtraDataType(cs->extraDataType, state, out);
+			fprintf(out, " %s;", cs->identifier);
+			break;
+		case CREATE_STATEMENT_COLLECTION_TYPE:
+			generateCollectionType(cs->collectionType, state, out);
+			fprintf(out, " %s;", cs->identifier);
+			break;
+		default:
+			invalidType("CreateStatement", cs->createStatementType);
+	}
+	fprintf(out, "\n");
 }
 
-static bool generateGraphType(CompilerState* state, GraphType* gt, FILE* out) {
-    generatePrimitiveDataType(state, gt->nodeType, out);
-    generatePrimitiveDataType(state, gt->edgeType, out);
+static void generateInsertStatement(InsertStatement* is, CompilerState* state, FILE* out) {
+	LogDebug("Generating InsertStatement...");
+	// TODO: Should be collection type
 }
 
-static bool generateDigraphType(CompilerState* state, DigraphType* dt, FILE* out) {
-    generatePrimitiveDataType(state, dt->nodeType, out);
-    generatePrimitiveDataType(state, dt->edgeType, out);
+static void generateLetBeStatement(LetBeStatement* lbs, CompilerState* state, FILE* out) {
+	LogDebug("Generating LetBeStatement...");
+	generatePrimitiveDataType(lbs->primitiveDataType, state, out);
+	fprintf(out, " %s;\n", lbs->identifier);
 }
 
-static bool generateDataTypeInstance(CompilerState* state, DataTypeInstance* dti, FILE* out) {
-    generatePrimitiveDataTypeInstance(state, dti->primitiveDataTypeInstance, out);
-    generateExtraDataTypeInstance(state, dti->extraDataTypeInstance, out);
+static void generateReturnStatement(ReturnStatement* rs, CompilerState* state, FILE* out) {
+	LogDebug("Generating ReturnStatement...");
+	switch (rs->returnStatementType) {
+		case RETURN_STATEMENT_VOID:
+			fprintf(out, "return;\n");
+			break;
+		case RETURN_STATEMENT_VALUE:
+			fprintf(out, "return ");
+			generateValue(rs->returnValue, state, out);
+			fprintf(out, ";\n");
+			break;
+		default:
+			invalidType("ReturnStatement", rs->returnStatementType);
+	}
 }
 
-static bool generatePrimitiveDataTypeInstance(CompilerState* state, PrimitiveDataTypeInstance* pdti, FILE* out) {
+static void generateAssignmentStatement(AssignmentStatement* as, CompilerState* state, FILE* out) {
+	LogDebug("Generating AssignmentStatement...");
+	switch(as->assignmentStatementType) {
+		case ASSIGNMENT_STATEMENT_IDENTIFIER:
+			fprintf(out, "%s = ", as->identifier);
+			generateValue(as->value, state, out);
+			fprintf(out, ";\n");
+			break;
+		case ASSIGNMENT_STATEMENT_IDENTIFIER_DOT_DATA:
+			fprintf(out, "%s.setData(", as->identifier);
+			generateValue(as->value, state, out); //TODO: types
+			fprintf(out, ");\n");
+			break;
+		default:
+			invalidType("AssignmentType", as->assignmentStatementType);
+	}
 }
 
-static bool generateExtraDataTypeInstance(CompilerState* state, ExtraDataTypeInstance* edti, FILE* out) {
-    generateNodeInstance(state, edti->nodeInstance, out);
-    generateEdgeInstance(state, edti->edgeInstance, out);
+static void generatePrintStatement(PrintStatement* ps, CompilerState* state, FILE* out) {
+	LogDebug("Generating PrintStatement...");
+	generateValue(ps->graph, state, out); // TODO: Check is graph
+	fprintf(out, ".print();\n");
 }
 
-static bool generateNodeInstance(CompilerState* state, NodeInstance* ni, FILE* out) {
-    generateValue(state, ni->label, out);
-    generateValue(state, ni->value, out);
+static void generateDumpStatement(DumpStatement* ds, CompilerState* state, FILE* out) {
+	LogDebug("Generating DumpStatement...");
+	switch(ds->dumpStatementType) {
+		case DUMP_STATEMENT:
+			generateValue(ds->graph, state, out); // Todo> Check is graph
+			fprintf(out, ".dump(");
+			generateValue(ds->file, state, out); // TODO: Check is String
+			fprintf(out, ");\n");
+			break;
+		case DUMP_STATEMENT_DOT:
+			generateValue(ds->graph, state, out); // Todo> Check is graph
+			fprintf(out, ".dumpAsDot(");
+			generateValue(ds->file, state, out); // TODO: Check is String
+			fprintf(out, ");\n");
+			break;
+		default:
+			invalidType("DumpStatement", ds->dumpStatementType);
+	}
 }
 
-static bool generateEdgeInstance(CompilerState* state, EdgeInstance* ei, FILE* out) {
-    generateValue(state, ei->left, out);
-    generateValue(state, ei->right, out);
-    generateValue(state, ei->value, out);
+static void generateStartDefinition(StartDefinition* sd, CompilerState* state, FILE* out) {
+	LogDebug("Generating StartDefinition...");
+	fprintf(out, "public static void main()");
+	generateBody(sd->body, state, out);
 }
-

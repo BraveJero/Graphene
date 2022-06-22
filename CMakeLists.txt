@@ -47,7 +47,6 @@ add_executable(Compiler
 	src/main.c
 	src/backend/domain-specific/ast.c
 	src/backend/semantic-analysis/contextStack.c
-	src/backend/semantic-analysis/semantic-analysis.c
 	src/backend/code-generation/generator.c
 	src/backend/support/logger.c
 	src/frontend/lexical-analysis/flex-actions.c

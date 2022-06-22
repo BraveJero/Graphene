@@ -1,7 +1,6 @@
 #include "backend/code-generation/generator.h"
 #include "backend/support/logger.h"
 #include "backend/support/shared.h"
-#include "backend/semantic-analysis/semantic-analysis.h"
 #include "frontend/syntactic-analysis/bison-parser.h"
 #include <stdio.h>
 
@@ -14,9 +13,12 @@ const int main(const int argumentCount, const char ** arguments) {
 	state.result = 0;
 	state.succeed = false;
 
+	const char * outputFileName = "Program.java";
 	// Mostrar parámetros recibidos por consola.
 	for (int i = 0; i < argumentCount; ++i) {
 		LogInfo("Argumento %d: '%s'", i, arguments[i]);
+		if (i == 1)
+			outputFileName = arguments[i];
 	}
 
 	// Compilar el programa de entrada.
@@ -25,12 +27,11 @@ const int main(const int argumentCount, const char ** arguments) {
 	switch (result) {
 		case 0:
 			if (state.succeed) {
-				int semanticalResult = SemanticalAnalysis(state);
-				if (semanticalResult != 0) {
+				/*if (SemanticalAnalysis(&state) == false) {
 					LogInfo("Error semantico.");
 					break;
-				}
-				// TODO: Generator(state.result);
+				}*/
+				Generator(&state, outputFileName);
 				LogInfo("La compilacion fue exitosa.");
 			}
 			else {

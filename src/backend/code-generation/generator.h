@@ -4,6 +4,6 @@
 #include "../domain-specific/ast.h"
 #include "../support/shared.h"
 
-bool Generator(CompilerState* state, const char * outputFileName);
+boolean Generator(CompilerState* state, const char * outputFileName);
 
 #endif
