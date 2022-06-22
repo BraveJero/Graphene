@@ -749,12 +749,14 @@ static void generateCreateStatement(CreateStatement* cs, CompilerState* state, F
 	LogDebug("Generating CreateStatement...");
 	switch(cs->createStatementType) {
 		case CREATE_STATEMENT_EXTRA_DATA_TYPE:
-			generateExtraDataType(cs->extraDataType, state, out);
+			generateExtraDataType(cs->extraDataType, state, out); // TODO: Instantiate
 			fprintf(out, " %s;", cs->identifier);
 			break;
 		case CREATE_STATEMENT_COLLECTION_TYPE:
 			generateCollectionType(cs->collectionType, state, out);
-			fprintf(out, " %s;", cs->identifier);
+			fprintf(out, " %s = ", cs->identifier);
+			generateInstanceFromCollectionType(cs->collectionType, state, out);
+			fprintf(out, ";");
 			break;
 		default:
 			invalidType("CreateStatement", cs->createStatementType);
