@@ -71,7 +71,13 @@ boolean Generator(CompilerState* state, const char * outputFileName) {
 
 static void generateProgram(Program* p, CompilerState* state, FILE* out) {
     LogDebug("Generating Program...");
-	fprintf(out, "class Program {\n");
+	fprintf(out, "import java.util.HashSet;\n"
+					"import java.util.Queue;\n"
+					"import java.util.Set;\n"
+					"import java.util.Stack;\n"
+					"import java.util.concurrent.LinkedBlockingQueue;\n"
+					"\n"
+					"public class Program {\n");
 
 	pushContext(state->symbolTable); // global context
 									 // no variables should be defined but maybe functions
