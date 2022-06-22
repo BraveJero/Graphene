@@ -722,6 +722,29 @@ static void generateWhileBlock(WhileBlock* wb, CompilerState* state, FILE* out) 
 	generateBody(wb->body, state, out);
 }
 
+static void generateInstanceFromCollectionType(CollectionType* ct, CompilerState* state, FILE* out) {
+	LogDebug("Instantiating CollectionType...");
+	switch(ct->collectionTypeType) {
+		case COLLECTION_TYPE_SET_TYPE:
+			fprintf(out, "new HashSet<>()");
+			break;
+		case COLLECTION_TYPE_STACK_TYPE:
+			fprintf(out, "new Stack<>()");
+			break;
+		case COLLECTION_TYPE_QUEUE_TYPE:
+			fprintf(out, "new LinkedBlockingQueue<>()");
+			break;
+		case COLLECTION_TYPE_GRAPH_TYPE:
+			fprintf(out, "new Bigraph<>()");
+			break;
+		case COLLECTION_TYPE_DIGRAPH_TYPE:
+			fprintf(out, "new Digraph<>()");
+			break;
+		default:
+			invalidType("CollectionType", ct->collectionTypeType);
+	}
+}
+
 static void generateCreateStatement(CreateStatement* cs, CompilerState* state, FILE* out) {
 	LogDebug("Generating CreateStatement...");
 	switch(cs->createStatementType) {
