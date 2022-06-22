@@ -17,8 +17,6 @@ const int main(const int argumentCount, const char ** arguments) {
 	// Mostrar parámetros recibidos por consola.
 	for (int i = 0; i < argumentCount; ++i) {
 		LogInfo("Argumento %d: '%s'", i, arguments[i]);
-		if (i == 1)
-			outputFileName = arguments[i];
 	}
 
 	// Compilar el programa de entrada.
