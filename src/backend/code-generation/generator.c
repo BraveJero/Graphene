@@ -681,10 +681,10 @@ static void generateCondition(Condition* c, CompilerState* state, FILE* out) {
 			generateCondition(c->condition, state, out);
 			break;
 		case CONDITION_IDENTIFIER_EMPTY: // TODO: Check if collection type
-			fprintf(out, "%s.empty()", c->identifier);
+			fprintf(out, "%s.isEmpty()", c->identifier);
 			break;
 		case CONDITION_IDENTIFIER_NOT_EMPTY: // TODO: Check if collection type
-			fprintf(out, "! %s.empty()", c->identifier);
+			fprintf(out, "! %s.isEmpty()", c->identifier);
 			break;
 		default:
 			invalidType("Condition", c->conditionType);
