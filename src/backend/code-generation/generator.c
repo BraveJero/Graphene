@@ -536,7 +536,7 @@ static void generatePrimitiveDataTypeInstance(PrimitiveDataTypeInstance* pdti, C
 	LogDebug("Generating PrimitiveDataTypeInstance...");
 	switch(pdti->primitiveDataTypeInstanceType) {
 		case PRIMITIVE_DATA_TYPE_INSTACE_STRING:
-			fprintf(out, "\"%s\"", pdti->string);
+			fprintf(out, "%s", pdti->string);
 			break;
 		case PRIMITIVE_DATA_TYPE_INSTACE_CHAR:
 			fprintf(out, "'%c'", pdti->letter);
