@@ -840,6 +840,6 @@ static void generateDumpStatement(DumpStatement* ds, CompilerState* state, FILE*
 
 static void generateStartDefinition(StartDefinition* sd, CompilerState* state, FILE* out) {
 	LogDebug("Generating StartDefinition...");
-	fprintf(out, "public static void main()");
+	fprintf(out, "public static void main(String[] args)");
 	generateBody(sd->body, state, out);
 }

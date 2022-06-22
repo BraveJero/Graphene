@@ -23,10 +23,10 @@ void yyerror(const char * string) {
 
 Program* newProgram(struct FunctionDefinitions* functionDefinitions, struct StartDefinition* startDefinition) {
     Program* p = malloc(sizeof(Program));
-    LogInfo("Program created with address: 0x%x\n", p);
     p->functionDefinitions = functionDefinitions;
     p->startDefinition = startDefinition;
     state.succeed = true;
+    state.program = p;
     return p;
 }
 
@@ -233,6 +233,7 @@ Condition* newConditionFromBoolean(boolean bool) {
 Condition* newConditionFromValueComparatorValue(Value* left, Comparator* comparator, Value* right) {
     Condition* c = newCondition();
     c->conditionType = CONDITION_VALUE_COMPARATOR_VALUE;
+    c->comparator = comparator;
     c->leftV = left;
     c->rightV = right;
     return c;
