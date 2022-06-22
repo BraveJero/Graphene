@@ -4,7 +4,7 @@
 
 typedef struct elementNode {
     char *id;
-    DataType *type;
+    void *data;
     struct elementNode *next;
 }elementNode;
 
@@ -16,15 +16,19 @@ typedef struct contextNode {
 
 struct contextStack {
     contextNode *current;
+    size_t size;
 };
 
 static void freeContext(contextNode *cn);
 static void freeList(elementNode *en);
-static elementNode *addToList(elementNode *list, const char *id, DataType *type, int *added);
+static elementNode *addToList(elementNode *list, const char *id, void *data, size_t size, int *error);
 
 
-contextStack *newContextStack() {
-    return calloc(1, sizeof(struct contextStack));
+contextStack *newContextStack(size_t size) {
+    contextStack *cs = malloc(sizeof(struct contextStack));
+    cs->current = NULL;
+    cs->size = size;
+    return cs;
 }
 
 int pushContext(contextStack *cs) {
@@ -43,28 +47,34 @@ int popContext(contextStack *cs) {
     return 0;
 }
 
-int addToContext(contextStack *cs, const char *id, DataType *type) {
+int addToContext(contextStack *cs, const char *id, void *type) {
     int error = 10;
-    cs->current->head = addToList(cs->current->head, id, type, &error);
+    if(cs->current == NULL)
+        pushContext(cs);
+    cs->current->head = addToList(cs->current->head, id, type, cs->size, &error);
     return error;
 }
 
-static DataType *retrieveTypeFromList(elementNode *list, const char *id) {
+static void *retrieveTypeFromList(elementNode *list, const char *id, size_t size) {
     elementNode *iter = list;
     while(iter != NULL) {
         if(strcmp(iter->id, id) == 0) {
-            return iter->type;
+            void *ans = malloc(size);
+            if(ans == NULL) goto finally;
+            memcpy(ans, iter->data, size);
+            return ans;
         }
         iter = iter->next;
     }
+    finally:
     return NULL;
 }
 
-DataType *retrieveType(contextStack *cs, const char *id) {
+void *retrieveData(contextStack *cs, const char *id) {
     contextNode *iter = cs->current;
-    DataType *ans = NULL;
+    void *ans = NULL;
     while(iter != NULL) {
-        ans = retrieveTypeFromList(iter->head, id);
+        ans = retrieveTypeFromList(iter->head, id, cs->size);
         if(ans != NULL) break;
         iter = iter->next;
     }
@@ -93,34 +103,42 @@ static void freeContext(contextNode *cn) {
 static void freeList(elementNode *en) {
     if(en == NULL) return;
     freeList(en->next);
+    free(en->data);
     free(en->id);
     free(en);
 }
 
-static elementNode *addToList(elementNode *list, const char *id, DataType *type, int *error) {
+static elementNode *addToList(elementNode *list, const char *id, void *data, size_t size, int *error) {
     int c;
     if(list == NULL || (c = strcmp(id, list->id)) < 0) {
         elementNode *newNode = malloc(sizeof(struct elementNode));
         if(newNode == NULL) {
-            *error = -1;
-            return NULL;
+            goto finally;
         }
+
         size_t len = strlen(id);
         newNode->id = malloc(len + 1);
         if(newNode->id == NULL) {
-            *error = -1;
-            return NULL;
+            goto finally;
         }
         strcpy(newNode->id, id);
-        newNode->type = type;
+
+        newNode->data = malloc(size);
+        if(newNode->data == NULL) {
+            goto finally;
+        }
+        memcpy(newNode->data, data, size);
+
         newNode->next = list;
         *error = 0;
         return newNode;
+
+        finally:
+        *error = -1;
     } else if(c == 0) {
         *error = -1;
-        return list;
     } else {
-        list->next = addToList(list->next, id, type, error);
-        return list;
+        list->next = addToList(list->next, id, data, size, error);
     }
+    return list;
 }
