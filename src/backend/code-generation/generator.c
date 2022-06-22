@@ -379,13 +379,38 @@ static void generateForBlock(ForBlock* fb, CompilerState* state, FILE* out) {
 	LogDebug("Generating ForBlock...");
 	generateForStatement(fb->forStatement, state, out);
 	generateBody(fb->body, state, out);
+	if (fb->forStatement->range->rangeType == RANGE_EACH) {
+		fprintf(out, ");\n");
+	}
 }
 
 static void generateForStatement(ForStatement* fs, CompilerState* state, FILE* out) {
 	LogDebug("Generating ForBlock...");
-	// TODO: Check how to do, depends on iterators
-	fprintf(out, "(TODO) FOR %s", fs->identifier);
-    generateRange(fs->range, state, out);
+	switch(fs->range->rangeType) {
+		case RANGE_INCLUSIVE:
+			fprintf(out, "for(int %s = ", fs->identifier);
+			generateValue(fs->range->value, state, out);
+			fprintf(out, "; %s <= ", fs->identifier);
+			generateValue(fs->range->limitValue, state, out);
+			fprintf(out, "; %s++)", fs->identifier);
+			break;
+		case RANGE_EXCLUSIVE:
+			fprintf(out, "for(int %s = ", fs->identifier);
+			generateValue(fs->range->value, state, out);
+			fprintf(out, "; %s < ", fs->identifier);
+			generateValue(fs->range->limitValue, state, out);
+			fprintf(out, "; %s++)", fs->identifier);
+			break;
+		case RANGE_EACH:
+			generateValue(fs->range->value, state, out);
+			fprintf(out, ".stream().forEach(");
+			break;
+		case RANGE_GRAPH:
+			fprintf(out, "AAAHHH\n");
+			break;
+		default:
+			invalidType("ForStatement->Range", fs->range->rangeType);
+	}
 }
 
 static void generateRange(Range* r, CompilerState* state, FILE* out) {
@@ -717,6 +742,9 @@ static void generateCreateStatement(CreateStatement* cs, CompilerState* state, F
 static void generateInsertStatement(InsertStatement* is, CompilerState* state, FILE* out) {
 	LogDebug("Generating InsertStatement...");
 	// TODO: Should be collection type
+	fprintf(out, "%s.add(", is->identifier);
+	generateValue(is->value, state, out);
+	fprintf(out, ");\n");
 }
 
 static void generateLetBeStatement(LetBeStatement* lbs, CompilerState* state, FILE* out) {
