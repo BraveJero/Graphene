@@ -1,36 +1,104 @@
 #include "contextStack.h"
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
+
+struct point {
+    int x, y;
+};
 
 int main() {
-    DataType integer = INT_TYPE, floaty = FLOAT_TYPE, string = STRING_TYPE;
-    contextStack *cs = newContextStack();
+    struct point p1 = (struct point) {
+        .x = 1,
+        .y = 2,
+    };
+    struct point p2 = (struct point) {
+        .x = 3,
+        .y = 4,
+    };
+    struct point p3 = (struct point) {
+        .x = 5,
+        .y = 6,
+    };
+    struct point p4 = (struct point) {
+        .x = 7,
+        .y = 8,
+    };
+    struct point *p1_cpy;
+    struct point *p2_cpy;
+    struct point *p3_cpy;
+
+    contextStack *cs = newContextStack(sizeof(struct point));
+
+    pushContext(cs);
     assert(cs != NULL);
 
+    assert(addToContext(cs, "p1", &p1) == 0);
+    assert(addToContext(cs, "p2", &p2) == 0);
+    assert(addToContext(cs, "p3", &p3) == 0);
+
+    p1_cpy = (struct point *) retrieveData(cs, "p1");
+    p2_cpy = (struct point *) retrieveData(cs, "p2");
+    p3_cpy = (struct point *) retrieveData(cs, "p3");
+
+    assert(p1_cpy != NULL);
+    assert(p2_cpy != NULL);
+    assert(p3_cpy != NULL);
+    assert(p1_cpy->x == p1.x);
+    assert(p1_cpy->y == p1.y);
+    assert(p2_cpy->x == p2.x);
+    assert(p2_cpy->y == p2.y);
+    assert(p3_cpy->x == p3.x);
+    assert(p3_cpy->y == p3.y);
+
+    free(p1_cpy);
+    free(p2_cpy);
+    free(p3_cpy);
+
     assert(pushContext(cs) == 0);
 
-    assert(addToContext(cs, "integer1", &integer) == 0);
-    assert(addToContext(cs, "float1", &floaty) == 0);
-    assert(addToContext(cs, "string1", &string) == 0);
-    assert(addToContext(cs, "integer1", &string) < 0);
+    assert(addToContext(cs, "p1", &p4) == 0);
+    p1_cpy = (struct point *) retrieveData(cs, "p1");
+    p2_cpy = (struct point *) retrieveData(cs, "p2");
+    p3_cpy = (struct point *) retrieveData(cs, "p3");
 
-    assert(*retrieveType(cs, "integer1") == INT_TYPE);
-    assert(*retrieveType(cs, "float1") == FLOAT_TYPE);
-    assert(*retrieveType(cs, "string1") == STRING_TYPE);
+    assert(p1_cpy != NULL);
+    assert(p2_cpy != NULL);
+    assert(p3_cpy != NULL);
+    assert(p1_cpy->x == p4.x);
+    assert(p1_cpy->y == p4.y);
+    assert(p2_cpy->x == p2.x);
+    assert(p2_cpy->y == p2.y);
+    assert(p3_cpy->x == p3.x);
+    assert(p3_cpy->y == p3.y);
 
-    assert(pushContext(cs) == 0);
-
-    assert(addToContext(cs, "integer1", &string) == 0);
-    assert(addToContext(cs, "integer2", &integer) == 0);
-    assert(addToContext(cs, "integer2", &integer) < 0);
-
-    assert(*retrieveType(cs, "integer1") == STRING_TYPE);
-    assert(*retrieveType(cs, "integer2") == INT_TYPE);
+    free(p1_cpy);
+    free(p2_cpy);
+    free(p3_cpy);
 
     assert(popContext(cs) == 0);
 
-    assert(*retrieveType(cs, "integer1") == INT_TYPE);
-    assert(retrieveType(cs, "integer2") == NULL);
+    assert(addToContext(cs, "p1", &p1) != 0);
+    assert(addToContext(cs, "p2", &p2) != 0);
+    assert(addToContext(cs, "p3", &p3) != 0);
+
+    p1_cpy = (struct point *) retrieveData(cs, "p1");
+    p2_cpy = (struct point *) retrieveData(cs, "p2");
+    p3_cpy = (struct point *) retrieveData(cs, "p3");
+
+    assert(p1_cpy != NULL);
+    assert(p2_cpy != NULL);
+    assert(p3_cpy != NULL);
+    assert(p1_cpy->x == p1.x);
+    assert(p1_cpy->y == p1.y);
+    assert(p2_cpy->x == p2.x);
+    assert(p2_cpy->y == p2.y);
+    assert(p3_cpy->x == p3.x);
+    assert(p3_cpy->y == p3.y);
+
+    free(p1_cpy);
+    free(p2_cpy);
+    free(p3_cpy);
 
     freeStack(cs);
     puts("OK!");
