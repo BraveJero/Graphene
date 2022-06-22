@@ -62,7 +62,7 @@ static void invalidType(const char * type, int token) {
 }
 
 boolean Generator(CompilerState* state, const char * outputFileName) {
-	FILE *out = fopen("temp", "w");
+	FILE *out = fopen("__temp", "w");
 	state->symbolTable = newContextStack();
 	generateProgram(state->program, state, out);
 	freeStack(state->symbolTable);
