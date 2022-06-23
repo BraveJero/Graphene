@@ -121,3 +121,7 @@ lex.yy.c
 .vscode
 *.class
 Program.java
+
+# JetBrains
+.idea/*
+cmake-build-debug/
