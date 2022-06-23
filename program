@@ -1,13 +1,14 @@
 # Example
 
 START:
-    CREATE DIGRAPH<INTEGER, EMPTY> g
+    CREATE DIGRAPH<EMPTY, EMPTY> g
 
     LET ceil BE INTEGER
     ceil <- 17
-    FOR i FROM 1 TO ceil:
+    FOR i FROM 1 TO ceil EXCLUSIVE:
         INSERT INTO g NODE<INTEGER> ("Node " + i)
-        INSERT INTO parent INTEGER i/2
+        LET parent BE INTEGER
+        parent <- i/2
         IF parent >= 1:
             INSERT INTO g EDGE<EMPTY> ("Node " + parent -> "Node " + i)
 

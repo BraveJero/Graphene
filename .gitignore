@@ -119,3 +119,5 @@ bison-parser.h
 flex-scanner.c
 lex.yy.c
 .vscode
+*.class
+Program.java

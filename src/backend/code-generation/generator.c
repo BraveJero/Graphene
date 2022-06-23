@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 #include "../../frontend/syntactic-analysis/bison-parser.h"
 #include "../support/logger.h"
@@ -56,17 +57,53 @@ static void generateExtraDataTypeInstance(ExtraDataTypeInstance* edti, CompilerS
 static void generateNodeInstance(NodeInstance* ni, CompilerState* state, FILE* out);
 static void generateEdgeInstance(EdgeInstance* ei, CompilerState* state, FILE* out);
 
+typedef enum ERRNO_ENUM {
+	SUCCESS,
+	FAILURE,
+} ERRNO_ENUM;
+
+static ERRNO_ENUM errno;
+
 static void invalidType(const char * type, int token) {
 	LogError("Unknwon type for %s: %d\n", type, token);
 	abort();
 }
 
+static void copyToOutput(const char * temp, const char * output) {
+	FILE* in = fopen(temp, "r");
+	FILE* out = fopen(output, "w");
+	if (in == NULL || out == NULL)
+		abort();
+	
+	int c = fgetc(in);
+    while (c != EOF)
+    {
+        fputc(c, out);
+        c = fgetc(in);
+    }
+
+	fclose(in);
+	fclose(out);
+}
+
 boolean Generator(CompilerState* state, const char * outputFileName) {
-	FILE *out = fopen("__temp__", "w");
+	FILE *out = fopen(TEMP_FILENAME, "w");
+	errno = SUCCESS;
+	
 	state->symbolTable = newContextStack();
 	generateProgram(state->program, state, out);
 	freeStack(state->symbolTable);
+
 	fclose(out);
+
+	if (errno == SUCCESS) {
+		copyToOutput(TEMP_FILENAME, outputFileName);
+		remove(TEMP_FILENAME);
+		return true;
+	}
+
+	remove(TEMP_FILENAME);
+	return false;
 }
 
 static void generateProgram(Program* p, CompilerState* state, FILE* out) {

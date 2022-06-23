@@ -2,5 +2,10 @@
 
 printf "Compiling\n"
 i=$1
-`cat "usecases/r8_$i.gene" | bin/Compiler &> /dev/null`
-printf "Compilation finished\n"
+echo "cat "$i" | bin/Compiler &> /dev/null"
+`cat "$i" | bin/Compiler &> /dev/null`
+if [ $? = 0 ]; then
+    printf "Compilation successful\n"
+else
+    printf "Compilation failed\n"
+fi
