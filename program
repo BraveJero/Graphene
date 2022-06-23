@@ -3,7 +3,8 @@
 START:
     CREATE DIGRAPH<INTEGER, EMPTY> g
 
-    INSERT INTO ceil INTEGER 17
+    LET ceil BE INTEGER
+    ceil <- 17
     FOR i FROM 1 TO ceil:
         INSERT INTO g NODE<INTEGER> ("Node " + i)
         INSERT INTO parent INTEGER i/2
