@@ -16,9 +16,9 @@ START:
     INSERT INTO g NODE<STRING> ("B", "TLA")
     INSERT INTO g NODE<STRING> ("C", "Protos")
 
-    INSERT INTO g EDGE<EMPTY> ("A" -> "B")
-    INSERT INTO g EDGE<EMPTY> ("A" -> "C")
+    INSERT INTO g EDGE<STRING> ("A" -> "B", "2")
+    INSERT INTO g EDGE<STRING> ("A" -> "C", "1")
 
-    FOR n IN nodesWithKeyword(g, ("1"), "1"):
+    FOR n IN nodesWithKeyword(g, "1", "1"):
         PRINT n
         # > [("1", "1"), ("uno", "1")]
