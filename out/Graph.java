@@ -4,10 +4,12 @@ import java.io.Writer;
 import java.util.*;
 import java.io.File;
 
-public abstract class Graph<N, E> {
+public abstract class Graph<N, E> implements Iterable<Node<N>>{
 
     private final Set<Node<N>> nodeSet = new HashSet<>();
     private final Set<Edge<E>> edgeSet = new HashSet<>();
+    private Traversal traversal = Traversal.BFS;
+    private String startingNode;
 
     public boolean isEmpty() {
         return nodeSet.isEmpty();
@@ -100,4 +102,33 @@ public abstract class Graph<N, E> {
         return null;
     }
 
+    public void setTraversalToDFS() {
+        traversal = Traversal.DFS;
+    }
+
+    public void setTraversalToBFS() {
+        traversal = Traversal.BFS;
+    }
+
+    public void setStartingNode(String label) {
+        startingNode = label;
+    }
+
+    public abstract Iterator<Node<N>> iteratorBFS(String label);
+
+    public abstract Iterator<Node<N>> iteratorDFS(String label);
+
+    @Override
+    public Iterator<Node<N>> iterator() {
+       switch (traversal) {
+           case BFS -> { return iteratorBFS(startingNode); }
+           case DFS -> { return iteratorDFS(startingNode); }
+       }
+       throw new IllegalStateException("No traversal supplied");
+    }
+
+    private enum Traversal {
+        DFS,
+        BFS;
+    }
 }
