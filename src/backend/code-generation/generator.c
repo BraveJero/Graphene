@@ -105,6 +105,7 @@ static void generateFunctionDefinitions(FunctionDefinitions* fd, CompilerState* 
 
 static void generateFunctionDefinition(FunctionDefinition* fd, CompilerState* state, FILE* out) {
 	LogDebug("Generating FunctionDefinition...");
+	fprintf(out, "static ");
 	generateDataType(fd->dataType, state, out);
 	fprintf(out, " %s", fd->identifier);
 	generateArgumentDefinition(fd->argumentDefinition, state, out);
@@ -403,7 +404,7 @@ static void generateForStatement(ForStatement* fs, CompilerState* state, FILE* o
 			break;
 		case RANGE_EACH:
 			generateValue(fs->range->value, state, out);
-			fprintf(out, ".stream().forEach(");
+			fprintf(out, ".forEach( (%s) -> ", fs->identifier);
 			break;
 		case RANGE_GRAPH:
 			fprintf(out, "AAAHHH\n");
@@ -814,8 +815,9 @@ static void generateAssignmentStatement(AssignmentStatement* as, CompilerState* 
 
 static void generatePrintStatement(PrintStatement* ps, CompilerState* state, FILE* out) {
 	LogDebug("Generating PrintStatement...");
+	fprintf(out, "System.out.print(");
 	generateValue(ps->graph, state, out); // TODO: Check is graph
-	fprintf(out, ".print();\n");
+	fprintf(out, ");\n");
 }
 
 static void generateDumpStatement(DumpStatement* ds, CompilerState* state, FILE* out) {
