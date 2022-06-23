@@ -1,5 +1,6 @@
 import javax.swing.plaf.ComponentInputMapUIResource;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
@@ -25,6 +26,18 @@ public class Bigraph<N, E> extends Graph<N, E> {
         }
         dot.append('}');
         return dot.toString();
+    }
+
+
+    // TODO: implement iteratorBFS and iteratorDFS
+    @Override
+    public Iterator<Node<N>> iteratorBFS(String label) {
+        return null;
+    }
+
+    @Override
+    public Iterator<Node<N>> iteratorDFS(String label) {
+        return null;
     }
 
     private static class Pair {
