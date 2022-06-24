@@ -1,0 +1,15 @@
+# R8.2
+# Aceptar
+# Crear un árbol de 15 nodos, cuyos nodos alberguen un número.
+
+START:
+    CREATE DIGRAPH<INTEGER, EMPTY> g
+
+    LET ceil BE INTEGER
+    ceil <- 15
+    FOR i FROM 1 TO ceil INCLUSIVE:
+        INSERT INTO g NODE<INTEGER> ("Node " + i, i)
+        LET parent BE INTEGER
+        parent <- i/2
+        IF parent >= 1:
+            INSERT INTO g EDGE<EMPTY> ("Node " + parent -> "Node " + i)

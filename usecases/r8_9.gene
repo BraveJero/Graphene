@@ -1,0 +1,18 @@
+# R8.9
+# Aceptar
+# Almacenar un grafo en un archivo.
+
+START:
+    CREATE DIGRAPH<INTEGER, EMPTY> g
+
+    LET ceil BE INTEGER
+    ceil <- 17
+    FOR i FROM 1 TO ceil EXCLUSIVE:
+        INSERT INTO g NODE<INTEGER> ("Node " + i, i)
+        LET parent BE INTEGER
+        parent <- i/2
+        IF parent >= 1:
+            INSERT INTO g EDGE<EMPTY> ("Node " + parent -> "Node " + i)
+
+    DUMP g IN "graph.out"
+

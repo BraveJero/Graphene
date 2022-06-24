@@ -1,0 +1,24 @@
+# R8.6
+# Aceptar
+# Crear un grafo de palabras y buscar en el mismo aquellos nodos con una palabra clave.
+
+DEF SET<STRING> nodesWithKeyword(GRAPH<STRING, STRING> g, STRING label0, STRING keyword):
+    CREATE SET<STRING> s
+    FOR n IN g WITH BFS ENTRY (label0):
+        IF n.DATA == keyword:
+            INSERT INTO s STRING n
+    
+    RETURN s
+
+START:
+    CREATE GRAPH<STRING, STRING> g
+    INSERT INTO g NODE<STRING> ("A", "TLA")
+    INSERT INTO g NODE<STRING> ("B", "TLA")
+    INSERT INTO g NODE<STRING> ("C", "Protos")
+
+    INSERT INTO g EDGE<STRING> ("A" -> "B", "2")
+    INSERT INTO g EDGE<STRING> ("A" -> "C", "1")
+
+    FOR n IN nodesWithKeyword(g, "1", "1"):
+        PRINT n
+        # > [("1", "1"), ("uno", "1")]

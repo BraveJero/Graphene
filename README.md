@@ -29,16 +29,21 @@ En un entorno _Microsoft Windows_, en lugar de ejecutar el comando `make`, se de
 
 ## Ejecución
 
-Para compilar un programa, primero cree un archivo vacío denominado `program` con el siguiente contenido:
+Como ejemplo, puede compilar el archivo de ejemplo denominado `program`.
 
-```
-123123 + 123 - 2 * (454 + 890 / 89)
-```
-
-Luego, ejecute el compilador desde el directorio raíz del proyecto, inyectando el programa desde la entrada estándard:
+Ejecute el compilador desde el directorio raíz del proyecto, inyectando el programa desde la entrada estándar:
 
 ```bash
 user@machine:path/ $ cat program | bin/Compiler
 ```
 
-Deberia obtener el resultado correcto de evaluar el programa anterior: `122318`.
+Deberia obtener el resultado correcto de evaluar el programa anterior: `Program.java`.
+
+Tambien se puede realizar lo mismo con uno de los "usecases" o escribir su propio programa.
+
+Para testear todos los usecases, recomendamos correr> `./test.sh`
+
+Finalmente, habiendo generado su codigo java preferido, puede correrlo de la siguiente forma:
+`mv Program.java out; cd out; javac *.java; java Program; rm *.class`
+
+Por ultimo, de tener instalado DOT Graphviz, recomendamos correr el programa de prueba y luego correr: 'dot -Tsvg graph.out > output.svg' para ver el resultado final.

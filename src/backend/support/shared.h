@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 
+#include "../domain-specific/ast.h"
+#include "../semantic-analysis/contextStack.h"
+
 // Descriptor del archivo de entrada que utiliza Bison.
 extern FILE * yyin;
 
@@ -10,7 +13,7 @@ extern FILE * yyin;
 extern FILE * yyout;
 
 // Variable global que contiene el número escaneado.
-extern int yylval;
+// extern int yylval;
 
 // Variable global que contiene el número de la línea analizada.
 extern int yylineno;
@@ -27,12 +30,6 @@ extern int yylex(void);
 // Función global del analizador sintáctico Bison.
 extern int yyparse(void);
 
-// Emular tipo "boolean".
-typedef enum {
-	false = 0,
-	true = 1
-} boolean;
-
 // Estado global de toda la aplicación.
 typedef struct {
 
@@ -42,10 +39,16 @@ typedef struct {
 	// Indica el resultado de la compilación:
 	int result;
 
-	// Agregar una pila para almacenar tokens/nodos.
 	// Agregar un nodo hacia la raíz del árbol de sintaxis abstracta.
+    struct Program* program;
+	// Agregar una pila para almacenar tokens/nodos.
 	// Agregar una tabla de símbolos.
+    struct contextStack* stfv; // Symbol Table For Variables
+	struct contextStack* stfr; // Symbol Table For Return
+	struct contextStack* stfa; // Symbol Table For Arguments
+
 	// ...
+
 
 } CompilerState;
 

@@ -1,0 +1,6 @@
+# R8.12
+# Rechazar
+# Imprimir un grafo inexistente.
+
+START:
+    PRINT g

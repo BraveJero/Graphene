@@ -1,0 +1,19 @@
+# R8.8
+# Aceptar
+# Crear un grafo, e imprimir el contenido en sus aristas (ignorar el contenido en los nodos).
+
+START:
+    CREATE DIGRAPH<EMPTY, INTEGER> g
+
+    LET ceil BE INTEGER
+    ceil <- 17
+
+    FOR i FROM 1 TO ceil INCLUSIVE:
+        INSERT INTO g NODE<EMPTY> ("Node " + i)
+        LET parent BE INTEGER
+        parent <- i/2
+        IF parent >= 1:
+            INSERT INTO g EDGE<INTEGER> ("Node " + parent -> "Node " + i, i)
+
+    FOR e IN g.edges:
+        PRINT e.data

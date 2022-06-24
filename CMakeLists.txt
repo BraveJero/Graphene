@@ -7,7 +7,7 @@ project(Compiler C)
 # Compilar el parser con Bison:
 add_custom_command(
 	OUTPUT ../src/frontend/syntactic-analysis/bison-parser.c ../src/frontend/syntactic-analysis/bison-parser.h
-	COMMAND bison -d ../src/frontend/syntactic-analysis/bison-grammar.y -o ../src/frontend/syntactic-analysis/bison-parser.c)
+	COMMAND bison -Wcounterexamples -d ../src/frontend/syntactic-analysis/bison-grammar.y -o ../src/frontend/syntactic-analysis/bison-parser.c)
 
 # Seleccionar estrategia según el compilador de C disponible en el sistema:
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
@@ -45,9 +45,11 @@ endif ()
 # Especificar punto de entrada del proyecto y códigos fuente (extensión *.c):
 add_executable(Compiler
 	src/main.c
+	src/backend/domain-specific/ast.c
+	src/backend/semantic-analysis/contextStack.c
 	src/backend/code-generation/generator.c
-	src/backend/domain-specific/calculator.c
 	src/backend/support/logger.c
+	src/backend/domain-specific/sem.c
 	src/frontend/lexical-analysis/flex-actions.c
 	src/frontend/lexical-analysis/flex-scanner.c
 	src/frontend/syntactic-analysis/bison-actions.c

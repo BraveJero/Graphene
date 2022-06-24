@@ -1,0 +1,9 @@
+# R8.1
+# Aceptar
+# Crear un grafo de 10 nodos.
+
+START:
+    CREATE GRAPH<EMPTY, EMPTY> g
+
+    FOR i FROM 1 TO 10 INCLUSIVE:
+        INSERT INTO g NODE<EMPTY> ("Node " + i)

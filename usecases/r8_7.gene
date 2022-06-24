@@ -1,0 +1,14 @@
+# R8.7
+# Aceptar
+# Crear 2 conjuntos de nodos, y obtener un único grafo desde ellos.
+
+START:
+    CREATE SET< NODE< EMPTY > > s1
+    INSERT INTO s1 NODE<EMPTY> ("1")
+
+    CREATE SET< NODE<EMPTY> > s2
+    INSERT INTO s1 NODE<EMPTY> ("3")
+
+    CREATE GRAPH<EMPTY, EMPTY> g
+    INSERT INTO g SET< NODE<EMPTY> > s1
+    INSERT INTO g SET< NODE<EMPTY> > s2

@@ -1,0 +1,7 @@
+# R8.13
+# Rechazar
+# Intentar imprimir un conjunto de aristas en lugar de un grafo.
+
+START:
+    CREATE SET<EDGE<EMPTY> > edgeSet
+    PRINT edgeSet

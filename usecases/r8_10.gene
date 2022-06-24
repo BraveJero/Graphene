@@ -1,0 +1,18 @@
+# R8.10
+# Aceptar
+# Transformar un grafo en formato DOT de Graphviz.
+
+START:
+    CREATE DIGRAPH<EMPTY, EMPTY> g
+
+    LET ceil BE INTEGER
+    ceil <- 17
+    FOR i FROM 1 TO ceil EXCLUSIVE:
+        INSERT INTO g NODE<EMPTY> ("Node " + i)
+        LET parent BE INTEGER
+        parent <- i/2
+        IF parent >= 1:
+            INSERT INTO g EDGE<EMPTY> ("Node " + parent -> "Node " + i)
+
+    DUMP g IN "graph.out" AS DOT
+

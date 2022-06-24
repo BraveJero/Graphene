@@ -13,6 +13,7 @@ const int main(const int argumentCount, const char ** arguments) {
 	state.result = 0;
 	state.succeed = false;
 
+	const char * outputFileName = "Program.java";
 	// Mostrar parámetros recibidos por consola.
 	for (int i = 0; i < argumentCount; ++i) {
 		LogInfo("Argumento %d: '%s'", i, arguments[i]);
@@ -24,8 +25,15 @@ const int main(const int argumentCount, const char ** arguments) {
 	switch (result) {
 		case 0:
 			if (state.succeed) {
+				/*if (SemanticalAnalysis(&state) == false) {
+					LogInfo("Error semantico.");
+					break;
+				}*/
+				if (!Generator(&state, outputFileName)) {
+					LogError("Se produjo un error en el analisis semantico.");
+					return -1;
+				}
 				LogInfo("La compilacion fue exitosa.");
-				Generator(state.result);
 			}
 			else {
 				LogError("Se produjo un error en la aplicacion.");
