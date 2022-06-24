@@ -29,7 +29,10 @@ const int main(const int argumentCount, const char ** arguments) {
 					LogInfo("Error semantico.");
 					break;
 				}*/
-				Generator(&state, outputFileName);
+				if (!Generator(&state, outputFileName)) {
+					LogError("Se produjo un error en el analisis semantico.");
+					return -1;
+				}
 				LogInfo("La compilacion fue exitosa.");
 			}
 			else {

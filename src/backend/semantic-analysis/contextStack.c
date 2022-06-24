@@ -1,6 +1,7 @@
 #include "contextStack.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 typedef struct elementNode {
     char *id;
@@ -51,7 +52,8 @@ int addToContext(contextStack *cs, const char *id, void *type) {
     int error = 10;
     if(cs->current == NULL)
         pushContext(cs);
-    cs->current->head = addToList(cs->current->head, id, type, cs->size, &error);
+    elementNode* en = addToList(cs->current->head, id, type, cs->size, &error);
+    cs->current->head = en;
     return error;
 }
 

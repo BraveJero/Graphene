@@ -43,7 +43,9 @@ typedef struct {
     struct Program* program;
 	// Agregar una pila para almacenar tokens/nodos.
 	// Agregar una tabla de símbolos.
-    struct contextStack* symbolTable;
+    struct contextStack* stfv; // Symbol Table For Variables
+	struct contextStack* stfr; // Symbol Table For Return
+	struct contextStack* stfa; // Symbol Table For Arguments
 
 	// ...
 
