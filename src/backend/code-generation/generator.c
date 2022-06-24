@@ -933,7 +933,7 @@ static void generateLetBeStatement(LetBeStatement* lbs, CompilerState* state, FI
 	DataType* dt = newDataTypeFromPrimitiveDataType(lbs->primitiveDataType);
 	addToContext(state->stfv, lbs->identifier, dt);
 	generatePrimitiveDataType(lbs->primitiveDataType, state, out);
-	fprintf(out, " %s;", lbs->identifier);
+	fprintf(out, " %s;\n", lbs->identifier);
 }
 
 static void generateReturnStatement(ReturnStatement* rs, CompilerState* state, FILE* out) {

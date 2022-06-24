@@ -45,3 +45,5 @@ Para testear todos los usecases, recomendamos correr> `./test.sh`
 
 Finalmente, habiendo generado su codigo java preferido, puede correrlo de la siguiente forma:
 `mv Program.java out; cd out; javac *.java; java Program; rm *.class`
+
+Por ultimo, de tener instalado DOT Graphviz, recomendamos correr el programa de prueba y luego correr: 'dot -Tsvg graph.out > output.svg' para ver el resultado final.
