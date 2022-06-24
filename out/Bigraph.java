@@ -38,7 +38,8 @@ public class Bigraph<N, E> extends Graph<N, E> {
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
-            if (!(o instanceof Pair pair)) return false;
+            if (!(o instanceof Pair)) return false;
+            Pair pair = (Pair) o;
             return (id1.equals(pair.id1) && id2.equals(pair.id2)) || (id1.equals(pair.id2) && id2.equals(pair.id1));
         }
 

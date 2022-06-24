@@ -20,6 +20,7 @@ boolean isStringType(DataType* dt);
 boolean isExtraDataType(DataType* dt);
 boolean isGraphType(DataType* dt);
 boolean isStackType(DataType* dt);
+boolean isSetType(DataType* dt);
 boolean isQueueType(DataType* dt);
 boolean matchArgumentDefinitionToParamDefinition(ArgumentDefinition* ad, ParamDefinition* pd);
 boolean areSameDataType(DataType* dt1, DataType* dt2);

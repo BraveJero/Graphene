@@ -1,4 +1,6 @@
-# Example
+# R8.10
+# Aceptar
+# Transformar un grafo en formato DOT de Graphviz.
 
 START:
     CREATE DIGRAPH<EMPTY, EMPTY> g
@@ -6,7 +8,7 @@ START:
     LET ceil BE INTEGER
     ceil <- 17
     FOR i FROM 1 TO ceil EXCLUSIVE:
-        INSERT INTO g NODE<INTEGER> ("Node " + i)
+        INSERT INTO g NODE<EMPTY> ("Node " + i)
         LET parent BE INTEGER
         parent <- i/2
         IF parent >= 1:

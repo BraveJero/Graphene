@@ -37,4 +37,11 @@ Ejecute el compilador desde el directorio raíz del proyecto, inyectando el prog
 user@machine:path/ $ cat program | bin/Compiler
 ```
 
-Deberia obtener el resultado correcto de evaluar el programa anterior: `program.c`.
+Deberia obtener el resultado correcto de evaluar el programa anterior: `Program.java`.
+
+Tambien se puede realizar lo mismo con uno de los "usecases" o escribir su propio programa.
+
+Para testear todos los usecases, recomendamos correr> `./test.sh`
+
+Finalmente, habiendo generado su codigo java preferido, puede correrlo de la siguiente forma:
+`mv Program.java out; cd out; javac *.java; java Program; rm *.class`

@@ -40,9 +40,9 @@ DataType* getDataType(Value* v) {
 		case VALUE_VALUE_DOT_DATA:
             return getInnerDataTypeFromExtraDataType(getDataType(v->value)->extraDataType);
 		case VALUE_VALUE_DOT_EDGES:
-            return newDataTypeFromExtraDataType(newExtraDataTypeFromNodeType(NULL)); //TODO: To check if nodes are of the same type, should get DataType of content
+            return newDataTypeFromCollectionType(newCollectionTypeFromSetType(newSetTypeFromExtraDataType(newExtraDataTypeFromEdgeType(newEdgeType(NULL))))); //TODO: To check if nodes are of the same type, should get DataType of content
 		case VALUE_VALUE_DOT_NODES:
-            return newDataTypeFromExtraDataType(newExtraDataTypeFromEdgeType(NULL)); //TODO: To check if nodes are of the same type, should get DataType of content
+            return newDataTypeFromCollectionType(newCollectionTypeFromSetType(newSetTypeFromExtraDataType(newExtraDataTypeFromNodeType(newNodeType(NULL))))); //TODO: To check if nodes are of the same type, should get DataType of content
 	}
     return NULL;
 }
@@ -140,6 +140,7 @@ DataType* getDataTypeFromPrimitiveDataType(PrimitiveDataType* pdt) {
 }
 
 boolean isCollectionType(DataType* dt) {
+    printf("%d\n", dt->dataTypeType);
     return dt->dataTypeType == DATA_TYPE_COLLECTION_TYPE;
 }
 
@@ -168,11 +169,17 @@ boolean isNumericType(DataType* dt) {
 }
 
 boolean isGraphType(DataType* dt) {
-    return isCollectionType(dt) && dt->collectionType->collectionTypeType == COLLECTION_TYPE_GRAPH_TYPE;
+    return isCollectionType(dt) &&
+        (dt->collectionType->collectionTypeType == COLLECTION_TYPE_GRAPH_TYPE ||
+            dt->collectionType->collectionTypeType == COLLECTION_TYPE_DIGRAPH_TYPE);
 }
 
 boolean isStackType(DataType* dt) {
     return isCollectionType(dt) && dt->collectionType->collectionTypeType == COLLECTION_TYPE_STACK_TYPE;
+}
+
+boolean isSetType(DataType* dt) {
+    return isCollectionType(dt) && dt->collectionType->collectionTypeType == COLLECTION_TYPE_SET_TYPE;
 }
 
 boolean isQueueType(DataType* dt) {
@@ -188,27 +195,18 @@ static boolean areSameExtraDataType(DataType* dt1, DataType* dt2) {
 }
 
 static boolean areSamePrimitiveDataType(DataType* dt1, DataType* dt2) {
-    printf("{{%x %x}}", dt1->primitiveDataType, dt2->primitiveDataType);
-    fflush(stdout);
     return dt1->primitiveDataType->token == dt2->primitiveDataType->token;
 }
 
 boolean areSameDataType(DataType* dt1, DataType* dt2) {
-    printf("A"); fflush(stdout);
     if (dt1 == NULL || dt2 == NULL)
         return false;
-    printf("A"); fflush(stdout);
     if (isCollectionType(dt1) && isCollectionType(dt2))
         return areSameCollectionType(dt1, dt2);
-    printf("A"); fflush(stdout);
     if (isExtraDataType(dt1) && isExtraDataType(dt2))
         return areSameExtraDataType(dt1, dt2);
-    printf("A"); fflush(stdout);
-    if (isPrimitiveDataType(dt1) && isPrimitiveDataType(dt2)) {
-        printf("B"); fflush(stdout);
+    if (isPrimitiveDataType(dt1) && isPrimitiveDataType(dt2))
         return areSamePrimitiveDataType(dt1, dt2);
-    }
-    printf("A"); fflush(stdout);
     return false;
 }
 

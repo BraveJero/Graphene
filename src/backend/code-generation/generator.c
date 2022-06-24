@@ -98,9 +98,9 @@ boolean Generator(CompilerState* state, const char * outputFileName) {
 	FILE *out = fopen(TEMP_FILENAME, "w");
 	errno = SUCCESS;
 	
-	state->stfv = newContextStack(sizeof(struct DataType*));
-	state->stfr = newContextStack(sizeof(struct DataType*));
-	state->stfa = newContextStack(sizeof(struct ArgumentDefinition*));
+	state->stfv = newContextStack(sizeof(struct DataType));
+	state->stfr = newContextStack(sizeof(struct DataType));
+	state->stfa = newContextStack(sizeof(struct ArgumentDefinition));
 	generateProgram(state->program, state, out);
 	freeStack(state->stfv);
 	freeStack(state->stfr);
@@ -190,7 +190,6 @@ static void generateDataType(DataType* dt, CompilerState* state, FILE* out) {
 
 static void generatePrimitiveDataType(PrimitiveDataType* pdt, CompilerState* state, FILE* out) {
 	LogDebug("Generating PrimitiveDataType...");
-	LogDebug("pdt: %d", pdt);
 	switch(pdt->token) {
 		case EMPTY_TYPE:
 			fprintf(out, "Empty"); // TODO: Check
@@ -420,8 +419,6 @@ static void generateStatement(Statement* s, CompilerState* state, FILE* out) {
 			break;
 		case STATEMENT_LET_BE_STATEMENT:
 			generateLetBeStatement(s->letBeStatement, state, out);
-			if (retrieveData(state->stfv, "ceil") != NULL)
-				LogDebug("Statement con print: %d\n", ((DataType*)retrieveData(state->stfv, "ceil"))->primitiveDataType);
 			break;
 		case STATEMENT_RETURN_STATEMENT:
 			generateReturnStatement(s->returnStatement, state, out);
@@ -438,8 +435,6 @@ static void generateStatement(Statement* s, CompilerState* state, FILE* out) {
 		default:
 			invalidType("Statement", s->statementType);
 	}
-	if (retrieveData(state->stfv, "ceil") != NULL)
-		LogDebug("Statement con print: %d\n", ((DataType*)retrieveData(state->stfv, "ceil"))->primitiveDataType);
 }
 
 static void generateForBlock(ForBlock* fb, CompilerState* state, FILE* out) {
@@ -447,7 +442,7 @@ static void generateForBlock(ForBlock* fb, CompilerState* state, FILE* out) {
 	pushContext(state->stfv);
 	generateForStatement(fb->forStatement, state, out);
 	generateBody(fb->body, state, out);
-	if (fb->forStatement->range->rangeType == RANGE_EACH) {
+	if (fb->forStatement->range->rangeType == RANGE_EACH || fb->forStatement->range->rangeType == RANGE_GRAPH) {
 		fprintf(out, ");\n");
 	}
 	popContext(state->stfv);
@@ -459,7 +454,6 @@ static void generateForStatement(ForStatement* fs, CompilerState* state, FILE* o
 		case RANGE_INCLUSIVE:
 			if (retrieveData(state->stfv, fs->identifier) != NULL)
 				semError(__LINE__);
-			LogDebug("%x %x %x %x", fs, fs->range, fs->range->value, getDataType(fs->range->value));
 			addToContext(state->stfv, fs->identifier, getDataType(fs->range->value));
 			if (!isIntegerType(getDataType(fs->range->value)))
 				semError(__LINE__);
@@ -486,16 +480,24 @@ static void generateForStatement(ForStatement* fs, CompilerState* state, FILE* o
 			fprintf(out, "; %s++)", fs->identifier);
 			break;
 		case RANGE_EACH:
-			if (!isCollectionType(getDataType(fs->range->value)));
+			LogDebug("Tipo %d, dt %x", isCollectionType(getDataType(fs->range->value)), getDataType(fs->range->value));
+			if (!isCollectionType(getDataType(fs->range->value)))
 				semError(__LINE__);
 			if (retrieveData(state->stfv, fs->identifier) != NULL)
 				semError(__LINE__);
-			addToContext(state->stfv, fs->identifier, getDataTypeFromCollectionType(((DataType*)getDataType(fs->range->value))->collectionType));
+			addToContext(state->stfv, fs->identifier, getInnerDataTypeFromCollectionType(((DataType*)getDataType(fs->range->value))->collectionType));
 			generateValue(fs->range->value, state, out);
 			fprintf(out, ".forEach( (%s) -> ", fs->identifier);
 			break;
 		case RANGE_GRAPH:
-			fprintf(out, "AAAHHH\n");
+			LogDebug("%x %x", fs->range->value, getDataType(fs->range->value));
+			// if (!isGraphType(getDataType(fs->range->value)));
+				// semError(__LINE__);
+			if (retrieveData(state->stfv, fs->identifier) != NULL)
+				semError(__LINE__);
+			addToContext(state->stfv, fs->identifier, newDataTypeFromExtraDataType(newExtraDataTypeFromNodeType(newNodeType(newPrimitiveDataType(STRING_TYPE))))); // TODO: We currently don't check inside the extraDataTypes
+			generateValue(fs->range->value, state, out);
+			fprintf(out, ".forEach( (%s) -> ", fs->identifier);
 			break;
 		default:
 			invalidType("ForStatement->Range", fs->range->rangeType);
@@ -560,19 +562,20 @@ static void generateValue(Value* v, CompilerState* state, FILE* out) {
 			generatePopFunction(v->popFunction, state, out);
 			break;
 		case VALUE_VALUE_DOT_DATA:
-			if (! isExtraDataType(getDataType(v->value)));
+			LogDebug("%s %x %x %x", v->value->identifier, v->value, getDataType(v->value)->dataTypeType, isExtraDataType(getDataType(v->value)));
+			if (! isExtraDataType(getDataType(v->value)))
 				semError(__LINE__);
 			generateValue(v->value, state, out);
 			fprintf(out, ".getData()");
 			break;
 		case VALUE_VALUE_DOT_EDGES:
-			if (! isGraphType(getDataType(v->value)));
+			if (! isGraphType(getDataType(v->value)))
 				semError(__LINE__);
 			generateValue(v->value, state, out);
 			fprintf(out, ".getEdges()");
 			break;
 		case VALUE_VALUE_DOT_NODES:
-			if (! isGraphType(getDataType(v->value)));
+			if (! isGraphType(getDataType(v->value)))
 				semError(__LINE__);
 			generateValue(v->value, state, out);
 			fprintf(out, ".getNodes()");
@@ -730,12 +733,14 @@ static void generateEdgeInstance(EdgeInstance* ei, CompilerState* state, FILE* o
 
 static void generatePopFunction(PopFunction* pf, CompilerState* state, FILE* out) {
 	LogDebug("Generating PopFunction...");
-	if (!(isStackType(getDataType(retrieveData(state->stfv, pf->identifier))) ||
-		isQueueType(getDataType(retrieveData(state->stfv, pf->identifier)))))
+	if (!(isStackType(retrieveData(state->stfv, pf->identifier)) ||
+		isQueueType(retrieveData(state->stfv, pf->identifier))))
 			semError(__LINE__);
-	if (isStackType(getDataType(retrieveData(state->stfv, pf->identifier))))
+	LogDebug("Generating PopFunction...");
+	if (isStackType(retrieveData(state->stfv, pf->identifier)))
 		fprintf(out, "%s.pop()", pf->identifier);
-	if (isQueueType(getDataType(retrieveData(state->stfv, pf->identifier))))
+		LogDebug("Generating PopFunction...");
+	if (isQueueType(retrieveData(state->stfv, pf->identifier)))
 		fprintf(out, "%s.remove()", pf->identifier);
 }
 
@@ -781,11 +786,23 @@ static void generateCondition(Condition* c, CompilerState* state, FILE* out) {
 			fprintf(out, "%s", (c->bool) ? "true" : "false");
 			break;
 		case CONDITION_VALUE_COMPARATOR_VALUE:
-			if (!(isNumericType(getDataType(c->leftV)) && isNumericType(getDataType(c->leftV))))
+			LogDebug("%d", __LINE__);
+			getDataType(c->leftV);
+			LogDebug("%d", __LINE__);
+			isNumericType(getDataType(c->leftV));
+			LogDebug("%d", __LINE__);
+			isNumericType(getDataType(c->rightV));
+			LogDebug("%d", __LINE__);
+			if (!(isNumericType(getDataType(c->leftV)) && isNumericType(getDataType(c->rightV))) && 
+				!isStringType(getDataType(c->leftV)))
 				semError(__LINE__);
+			LogDebug("%d", __LINE__);
 			generateValue(c->leftV, state, out);
+			LogDebug("%d", __LINE__);
 			generateComparator(c->comparator, state, out);
+			LogDebug("%d", __LINE__);
 			generateValue(c->rightV, state, out);
+			LogDebug("%d", __LINE__);
 			break;
 		case CONDITION_CONDITION_AND_CONDITION:
 			generateCondition(c->leftC, state, out);
@@ -802,12 +819,12 @@ static void generateCondition(Condition* c, CompilerState* state, FILE* out) {
 			generateCondition(c->condition, state, out);
 			break;
 		case CONDITION_IDENTIFIER_EMPTY:
-			if (! isCollectionType(getDataType(retrieveData(state->stfv, c->identifier))))
+			if (! isCollectionType(retrieveData(state->stfv, c->identifier)))
 				semError(__LINE__);
 			fprintf(out, "%s.isEmpty()", c->identifier);
 			break;
 		case CONDITION_IDENTIFIER_NOT_EMPTY:
-			if (! isCollectionType(getDataType(retrieveData(state->stfv, c->identifier))))
+			if (! isCollectionType(retrieveData(state->stfv, c->identifier)))
 				semError(__LINE__);
 			fprintf(out, "! %s.isEmpty()", c->identifier);
 			break;
@@ -899,6 +916,11 @@ static void generateInsertStatement(InsertStatement* is, CompilerState* state, F
 	LogDebug("Generating InsertStatement...");
 	if (! isCollectionType(retrieveData(state->stfv, is->identifier)))
 		semError(__LINE__);
+	// if (! areSameDataType(
+	// 		getInnerDataTypeFromCollectionType(((DataType*)retrieveData(state->stfv, is->identifier))->collectionType),
+	// 		is->dataType)
+	// 	)
+	// 	semError(__LINE__);
 	fprintf(out, "%s.add(", is->identifier);
 	generateValue(is->value, state, out);
 	fprintf(out, ");\n");
@@ -909,21 +931,9 @@ static void generateLetBeStatement(LetBeStatement* lbs, CompilerState* state, FI
 	if (retrieveData(state->stfv, lbs->identifier) != NULL)
 		semError(__LINE__);
 	DataType* dt = newDataTypeFromPrimitiveDataType(lbs->primitiveDataType);
-	LogDebug("Antes de guardar: %d\n", lbs->primitiveDataType);
-
-	LogDebug("ACA DEBERIA ESTAR ?????????? con print: %d %d %d\n",
-	dt->primitiveDataType,
-	dt->dataTypeType,
-	dt->primitiveDataType);
 	addToContext(state->stfv, lbs->identifier, dt);
-	if (retrieveData(state->stfv, "ceil") != NULL)
-		LogDebug("ACA DEBERIA ESTAR Statement con print: %d %d %d\n",
-		((DataType*)retrieveData(state->stfv, "ceil"))->primitiveDataType,
-		((DataType*)retrieveData(state->stfv, "ceil"))->dataTypeType,
-		((DataType*)retrieveData(state->stfv, "ceil"))->primitiveDataType);
 	generatePrimitiveDataType(lbs->primitiveDataType, state, out);
-	if (retrieveData(state->stfv, "ceil") != NULL)
-		LogDebug("ACA TAMBIEN DEBERIA ESTAR Statement con print: %d\n", ((DataType*)retrieveData(state->stfv, "ceil"))->primitiveDataType);
+	fprintf(out, " %s;", lbs->identifier);
 }
 
 static void generateReturnStatement(ReturnStatement* rs, CompilerState* state, FILE* out) {
@@ -944,23 +954,13 @@ static void generateReturnStatement(ReturnStatement* rs, CompilerState* state, F
 
 static void generateAssignmentStatement(AssignmentStatement* as, CompilerState* state, FILE* out) {
 	LogDebug("Generating AssignmentStatement...");
-			LogDebug("%x %x", ((DataType*)retrieveData(state->stfv, as->identifier))->primitiveDataType);
 	switch(as->assignmentStatementType) {
 		case ASSIGNMENT_STATEMENT_IDENTIFIER:
-			LogDebug("%x %x", ((DataType*)retrieveData(state->stfv, as->identifier))->primitiveDataType);
-			LogDebug("{{%d}}\n", __LINE__);
-			retrieveData(state->stfv, as->identifier);
-			LogDebug("{{%d}}\n", __LINE__);
-			getDataType(as->value);
-			LogDebug("{{IDENASS: %s%d}}\n", as->identifier, __LINE__);
-			LogDebug("%x %x", ((DataType*)retrieveData(state->stfv, as->identifier))->primitiveDataType);
-			LogDebug("{{%d}}\n", __LINE__);
 			if (! areSameDataType(
 				retrieveData(state->stfv, as->identifier),
 				getDataType(as->value)
 			))
 				semError(__LINE__);
-			LogDebug("{{%d}}", __LINE__);
 			fprintf(out, "%s = ", as->identifier);
 			generateValue(as->value, state, out);
 			fprintf(out, ";\n");
@@ -969,9 +969,10 @@ static void generateAssignmentStatement(AssignmentStatement* as, CompilerState* 
 			if (! isExtraDataType(retrieveData(state->stfv, as->identifier)))
 				semError(__LINE__);
 			if (! areSameDataType(
-				getDataTypeFromExtraDataType(retrieveData(state->stfv, as->identifier)),
+				retrieveData(state->stfv, as->identifier),
 				getDataType(as->value)
 			))
+				semError(__LINE__);
 			fprintf(out, "%s.setData(", as->identifier);
 			generateValue(as->value, state, out);
 			fprintf(out, ");\n");
@@ -983,6 +984,8 @@ static void generateAssignmentStatement(AssignmentStatement* as, CompilerState* 
 
 static void generatePrintStatement(PrintStatement* ps, CompilerState* state, FILE* out) {
 	LogDebug("Generating PrintStatement...");
+	if (isStackType(getDataType(ps->graph)) || isSetType(getDataType(ps->graph)))
+		semError(__LINE__);
 	fprintf(out, "System.out.print(");
 	generateValue(ps->graph, state, out);
 	fprintf(out, ");\n");
