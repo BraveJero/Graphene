@@ -838,10 +838,10 @@ static void generateComparator(Comparator* c, CompilerState* state, FILE* out) {
 	LogDebug("Generating Comparator...");
 	switch(c->comparatorType) {
 		case COMPARATOR_GEQ:
-			fprintf(out, "<=");
+			fprintf(out, ">=");
 			break;
 		case COMPARATOR_LEQ:
-			fprintf(out, ">=");
+			fprintf(out, ",=");
 			break;
 		case COMPARATOR_GT:
 			fprintf(out, ">");
